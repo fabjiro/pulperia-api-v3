@@ -8,19 +8,29 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthReqDto } from './dto/auth.req.dto';
+import { AuthLoginReqDto } from './dto/auth.req.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
+import { RegisterUserDto } from '../user/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  async login(@Body() createAuthDto: AuthReqDto) {
+  @Post('login')
+  async login(@Body() createAuthDto: AuthLoginReqDto) {
     try {
       return await this.authService.login(createAuthDto);
     } catch (error) {
-      throw new NotFoundException(error);
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Post('register')
+  async register(@Body() createAuthDto: RegisterUserDto) {
+    try {
+      return await this.authService.registerUser(createAuthDto);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
     }
   }
 
@@ -30,7 +40,7 @@ export class AuthController {
     try {
       return this.authService.me(req.user.id);
     } catch (error) {
-      throw new NotFoundException(error);
+      throw new NotFoundException(error.toString());
     }
   }
 }

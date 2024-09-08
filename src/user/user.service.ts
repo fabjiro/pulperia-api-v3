@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/user.dto';
 import { RolService } from '../rol/rol.service';
 import { Rol } from '../rol/entity/rol.entity';
+import { RolEnum } from '../rol/enum/RolEnum';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
   ) {}
 
   async add(userData: RegisterUserDto, rol?: Rol) {
-    const defaultRol = rol ?? (await this.rolService.findById(0));
+    const defaultRol = rol ?? (await this.rolService.findById(RolEnum.USER));
 
     const newUser = this.userRepository.create({
       ...userData,

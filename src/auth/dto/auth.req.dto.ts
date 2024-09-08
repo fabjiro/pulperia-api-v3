@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class AuthReqDto {
+export class AuthLoginReqDto {
   @IsNotEmpty({ message: 'El campo correo es requerido' })
   @IsEmail({}, { message: 'El correo no es valido' })
   email: string;

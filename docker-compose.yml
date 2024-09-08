@@ -6,11 +6,8 @@ services:
     ports:
       - '3000:3000'
     # environment:
-    #   DATABASE_HOST: db
-    #   DATABASE_PORT: 5432
-    #   DATABASE_USERNAME: postgres
-    #   DATABASE_PASSWORD: postgres
-    #   DATABASE_NAME: pulperia
+    #   JWT_SECRET:fabjiroScret
+    #   POSTGRES_URL:postgresql://postgres:postgres@192.168.1.22:5432/pulperia
     depends_on:
       - db
     networks:

@@ -3,7 +3,7 @@ import { UserService } from '../user/user.service';
 import { RegisterUserDto } from '../user/dto/user.dto';
 import { IAuthRes } from './dto/auth.res.dto';
 import { EncryptionService } from '../utils/encrypt.utils';
-import { AuthReqDto } from './dto/auth.req.dto';
+import { AuthLoginReqDto } from './dto/auth.req.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async registerUser(userData: RegisterUserDto): Promise<IAuthRes> {
-    const existEmailt = this.userService.findByEmail(userData.email);
+    const existEmailt = await this.userService.findByEmail(userData.email);
 
     if (existEmailt) {
       throw new Error('Email already exists');
@@ -38,7 +38,7 @@ export class AuthService {
     };
   }
 
-  async login(userData: AuthReqDto): Promise<IAuthRes> {
+  async login(userData: AuthLoginReqDto): Promise<IAuthRes> {
     const userByEmail = await this.userService.findByEmail(userData.email);
 
     if (!userByEmail) {
@@ -69,6 +69,11 @@ export class AuthService {
     return {
       name: user.name,
     };
+  }
+
+  async validateProfile(id: number): Promise<boolean> {
+    const user = await this.userService.findBydId(id);
+    return !!user;
   }
 
   generateToken(id: number) {
