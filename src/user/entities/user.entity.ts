@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { IsNotEmpty, IsEmail } from 'class-validator';
+import { Rol } from '../../rol/entity/rol.entity';
 
 @Entity()
 export class User {
@@ -18,4 +19,7 @@ export class User {
   @Column()
   @IsNotEmpty()
   password: string;
+
+  @ManyToOne(() => Rol, (role) => role.users)
+  rol: Rol;
 }
