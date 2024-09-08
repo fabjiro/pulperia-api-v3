@@ -1,0 +1,51 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: pulperia-api
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: pulperia
+    depends_on:
+      - db
+    networks:
+      - pulperia-network
+
+  db:
+    image: postgres:13
+    container_name: pulperia-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pulperia
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pulperia-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pulperia-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    networks:
+      - pulperia-network
+
+volumes:
+  postgres_data:
+
+networks:
+  pulperia-network:
+    driver: bridge
