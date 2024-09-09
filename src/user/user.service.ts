@@ -2,23 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { RegisterUserDto } from './dto/user.dto';
 import { RolService } from '../rol/rol.service';
-import { Rol } from '../rol/entity/rol.entity';
 import { RolEnum } from '../rol/enum/RolEnum';
+import { UserRegister } from './interface/user.interface';
+import { ImageService } from '../image/image.service';
+import { AVATARUSERENUM } from './enum/user.enum';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly rolService: RolService,
+    private readonly imageService: ImageService,
   ) {}
 
-  async add(userData: RegisterUserDto, rol?: Rol) {
-    const defaultRol = rol ?? (await this.rolService.findById(RolEnum.USER));
+  async add(userData: UserRegister) {
+    const defaultRol = await this.rolService.findById(
+      userData.rol ?? RolEnum.USER,
+    );
+
+    const avatar = await this.imageService.findById(
+      userData.avatar ?? AVATARUSERENUM.DEFAULT,
+    );
 
     const newUser = this.userRepository.create({
       ...userData,
+      avatar,
       rol: defaultRol,
     });
 
@@ -26,10 +35,16 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['rol', 'avatar'],
+    });
   }
 
   async findBydId(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['rol', 'avatar'],
+    });
   }
 }

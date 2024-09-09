@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsBase64, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class RegisterUserDto {
   @IsNotEmpty({ message: 'El campo nombre es requerido' })
@@ -10,4 +10,8 @@ export class RegisterUserDto {
 
   @IsNotEmpty({ message: 'El campo password es requerido' })
   password: string;
+
+  @IsOptional()
+  // @IsBase64({}, { message: 'La imagen debe ser un base64' })
+  avatar?: string;
 }

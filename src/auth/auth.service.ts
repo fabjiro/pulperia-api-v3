@@ -5,6 +5,7 @@ import { IAuthRes } from './dto/auth.res.dto';
 import { EncryptionService } from '../utils/encrypt.utils';
 import { AuthLoginReqDto } from './dto/auth.req.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly encriptService: EncryptionService,
     private readonly jwtService: JwtService,
+    private readonly imageService: ImageService,
   ) {}
 
   async registerUser(userData: RegisterUserDto): Promise<IAuthRes> {
@@ -25,15 +27,26 @@ export class AuthService {
       userData.password,
     );
 
+    const avatar = await this.imageService.saveImage(userData.avatar);
+    const avatarLocal = await this.imageService.findById(avatar.id ?? 0);
+
     const newUser = await this.userService.add({
-      ...userData,
+      email: userData.email,
+      name: userData.name,
+      avatar: avatar.id,
       password: hashedPassword,
     });
 
     const tokens = this.generateToken(newUser.id);
 
     return {
-      user: newUser.name,
+      user: {
+        name: newUser.name,
+        avatar: {
+          original_link: avatarLocal.original_link,
+          min_link: avatarLocal.min_link,
+        },
+      },
       ...tokens,
     };
   }
@@ -58,7 +71,13 @@ export class AuthService {
     const tokens = this.generateToken(userByEmail.id);
 
     return {
-      user: userByEmail.name,
+      user: {
+        name: userByEmail.name,
+        avatar: {
+          original_link: userByEmail.avatar.original_link,
+          min_link: userByEmail.avatar.min_link,
+        },
+      },
       ...tokens,
     };
   }
@@ -68,6 +87,10 @@ export class AuthService {
 
     return {
       name: user.name,
+      avatar: {
+        original_link: user.avatar?.original_link ?? '',
+        min_link: user.avatar?.min_link ?? '',
+      },
     };
   }
 

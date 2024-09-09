@@ -1,5 +1,7 @@
+import { UserRes } from '../../user/interface/user.interface';
+
 export interface IAuthRes {
-  user: string;
+  user: UserRes;
   token: string;
   refreshToken: string;
 }

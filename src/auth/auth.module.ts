@@ -6,10 +6,12 @@ import { EncryptionService } from '../utils/encrypt.utils';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { ImageModule } from '../image/image.module';
 
 @Module({
   imports: [
     UserModule, // Asegúrate de importar el módulo que contiene UserService
+    ImageModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => {
