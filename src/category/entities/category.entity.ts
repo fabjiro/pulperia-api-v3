@@ -1,5 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Status } from '../../status/entities/status.entity';
 
 @Entity()
 export class Category {
@@ -9,4 +10,7 @@ export class Category {
   @Column()
   @IsNotEmpty()
   name: string;
+
+  @ManyToOne(() => Status, (status) => status.categories) // Relación muchos-a-uno con Status
+  status: Status;
 }

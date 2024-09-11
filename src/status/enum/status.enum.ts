@@ -1,5 +1,5 @@
 export enum STATUSENUM {
-  REVISION = 0,
-  ACTIVO = 1,
-  DESHABILITADO = 2,
+  REVIEW = 0,
+  ACTIVE = 1,
+  DISABLED = 2,
 }
