@@ -10,6 +10,9 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
+import { Roles } from '../rol/decorators/rols.decorator';
+import { RolesGuard } from '../rol/guards/role.guard';
+import { RolEnum } from '../rol/enum/RolEnum';
 
 @Controller('product')
 @UseGuards(JwtAuthGuard)
@@ -17,6 +20,8 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @Roles(RolEnum.ADMIN)
+  @UseGuards(RolesGuard)
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       return await this.productService.create(createProductDto);

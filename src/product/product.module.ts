@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { StatusModule } from '../status/status.module';
 import { ImageModule } from '../image/image.module';
 import { CategoryModule } from '../category/category.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CategoryModule } from '../category/category.module';
     StatusModule,
     ImageModule,
     CategoryModule,
+    UserModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],
