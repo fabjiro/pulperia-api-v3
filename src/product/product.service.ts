@@ -45,7 +45,19 @@ export class ProductService {
     return await this.productRepository.save(newProduct);
   }
 
-  async findAll() {
+  async findAll(status?: number) {
+    if (status) {
+      const statusDb = await this.statusService.findOne(status);
+
+      if (!statusDb) {
+        throw new Error('Status not found');
+      }
+
+      return await this.productRepository.find({
+        where: { status: statusDb },
+        relations: ['status', 'image'],
+      });
+    }
     return await this.productRepository.find({
       relations: ['status', 'image'],
     });

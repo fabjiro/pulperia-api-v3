@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Query,
+  NotFoundException,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
@@ -14,7 +22,11 @@ export class CategoryController {
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  async findAll(@Query('status') status?: number) {
+    try {
+      return await this.categoryService.findAll(status);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
   }
 }

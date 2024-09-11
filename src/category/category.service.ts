@@ -27,7 +27,19 @@ export class CategoryService {
     return await this.categoryRepository.save(newCategory);
   }
 
-  async findAll() {
+  async findAll(status?: number) {
+    if (status) {
+      const statusDb = await this.statusService.findOne(status);
+
+      if (!statusDb) {
+        throw new Error('Status not found');
+      }
+
+      return await this.categoryRepository.find({
+        where: { status: statusDb },
+        relations: ['status'],
+      });
+    }
     return await this.categoryRepository.find({
       relations: ['status'],
     });

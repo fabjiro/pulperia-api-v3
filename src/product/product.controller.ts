@@ -5,6 +5,7 @@ import {
   Body,
   UseGuards,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -18,14 +19,14 @@ export class ProductController {
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
     try {
-      return this.productService.create(createProductDto);
+      return await this.productService.create(createProductDto);
     } catch (error) {
       throw new NotFoundException(error.toString());
     }
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(@Query('status') status?: number) {
+    return this.productService.findAll(status);
   }
 }
