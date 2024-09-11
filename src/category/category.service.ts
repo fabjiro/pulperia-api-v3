@@ -48,7 +48,21 @@ export class CategoryService {
   async findOne(id: number) {
     return await this.categoryRepository.findOne({
       where: { id },
-      relations: ['status'],
+      relations: ['status', 'products'],
     });
+  }
+
+  async deleteById(id: number) {
+    const category = await this.findOne(id);
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    if ((category.products ?? []).length > 0) {
+      throw new Error('Category has products');
+    }
+
+    return await this.categoryRepository.remove(category);
   }
 }
