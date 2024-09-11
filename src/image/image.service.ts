@@ -63,7 +63,7 @@ export class ImageService {
       .png({ quality: quality }) // Ajustar la calidad (cuanto menor, más comprimida)
       .toBuffer(); // Convertir a buffer
 
-    const compressedBase64 = `data:image/jpeg;base64,${image.toString('base64')}`;
+    const compressedBase64 = `data:image/png;base64,${image.toString('base64')}`;
     return compressedBase64;
   }
 
