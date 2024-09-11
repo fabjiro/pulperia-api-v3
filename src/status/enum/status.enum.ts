@@ -1,0 +1,5 @@
+export enum STATUSENUM {
+  REVISION = 0,
+  ACTIVO = 1,
+  DESHABILITADO = 2,
+}
