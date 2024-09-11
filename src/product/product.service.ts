@@ -18,6 +18,19 @@ export class ProductService {
     private readonly categoryService: CategoryService,
   ) {}
 
+  async deleteById(id: number) {
+    const product = await this.findOne(id);
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+    const result = await this.productRepository.remove(product);
+
+    await this.imageService.deleteById(product.image.id);
+
+    return result;
+  }
+
   async create(createProductDto: ICreateProduct) {
     const category = await this.categoryService.findOne(
       createProductDto.category,
@@ -59,6 +72,13 @@ export class ProductService {
       });
     }
     return await this.productRepository.find({
+      relations: ['status', 'image'],
+    });
+  }
+
+  async findOne(id: number) {
+    return await this.productRepository.findOne({
+      where: { id },
       relations: ['status', 'image'],
     });
   }

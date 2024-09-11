@@ -6,6 +6,8 @@ import {
   UseGuards,
   NotFoundException,
   Query,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,6 +27,17 @@ export class ProductController {
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       return await this.productService.create(createProductDto);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Delete(':id')
+  @Roles(RolEnum.ADMIN)
+  @UseGuards(RolesGuard)
+  async delete(@Param('id') id: number) {
+    try {
+      return await this.productService.deleteById(id);
     } catch (error) {
       throw new NotFoundException(error.toString());
     }

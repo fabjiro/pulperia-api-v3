@@ -6,6 +6,9 @@ import { ImagePostRes } from './dto/image.dto';
 import * as sharp from 'sharp';
 import axios, { AxiosInstance } from 'axios';
 
+const uuidRegex =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+
 @Injectable()
 export class ImageService {
   private readonly axiosInstance: AxiosInstance;
@@ -24,6 +27,21 @@ export class ImageService {
       });
       return config;
     });
+  }
+
+  async deleteById(id: number) {
+    const image = await this.findById(id);
+
+    if (!image) {
+      throw new Error('Image not found');
+    }
+
+    await Promise.all([
+      this.deleteImagePost(image.original_link),
+      this.deleteImagePost(image.min_link),
+    ]);
+
+    return await this.imageRepository.remove(image);
   }
 
   async findById(id: number): Promise<Image> {
@@ -73,5 +91,9 @@ export class ImageService {
     });
 
     return data as ImagePostRes;
+  }
+
+  async deleteImagePost(link: string) {
+    await this.axiosInstance.delete(`/file/${link.match(uuidRegex)[0]}`);
   }
 }
