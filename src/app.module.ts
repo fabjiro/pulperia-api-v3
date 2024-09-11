@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ImageModule } from './image/image.module';
 import { CategoryModule } from './category/category.module';
 import { StatusModule } from './status/status.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StatusModule } from './status/status.module';
     ImageModule,
     CategoryModule,
     StatusModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

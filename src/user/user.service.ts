@@ -6,7 +6,7 @@ import { RolService } from '../rol/rol.service';
 import { RolEnum } from '../rol/enum/RolEnum';
 import { UserRegister } from './interface/user.interface';
 import { ImageService } from '../image/image.service';
-import { AVATARUSERENUM } from './enum/user.enum';
+import { IMAGEENUM } from '../image/enum/image.enum';
 
 @Injectable()
 export class UserService {
@@ -22,7 +22,7 @@ export class UserService {
     );
 
     const avatar = await this.imageService.findById(
-      userData.avatar ?? AVATARUSERENUM.DEFAULT,
+      userData.avatar ?? IMAGEENUM.DEFAULTUSER,
     );
 
     const newUser = this.userRepository.create({

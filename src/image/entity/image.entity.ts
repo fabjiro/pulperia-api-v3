@@ -1,6 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Product } from '../../product/entities/product.entity';
 
 @Entity()
 export class Image {
@@ -17,4 +18,7 @@ export class Image {
 
   @OneToMany(() => User, (user) => user.avatar)
   users: User[];
+
+  @OneToMany(() => Product, (product) => product.image)
+  products: Product[];
 }

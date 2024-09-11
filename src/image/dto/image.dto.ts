@@ -1,5 +1,5 @@
 export interface ImagePostRes {
-  id: string;
+  id: number;
   projectId: string;
   link: string;
   pathRemote: string;

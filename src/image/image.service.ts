@@ -40,9 +40,6 @@ export class ImageService {
         this.postImage(base64),
         this.postImage(minImage),
       ]);
-      
-      console.log('xdddddddddddddddddddddddd');
-      console.log(imageOriginal.link, imageMin.link);
 
       const newImage = this.imageRepository.create({
         original_link: imageOriginal.link,
@@ -63,7 +60,7 @@ export class ImageService {
     const buffer = Buffer.from(base64Str.split(',')[1], 'base64');
 
     const image = await sharp(buffer)
-      .jpeg({ quality: quality }) // Ajustar la calidad (cuanto menor, más comprimida)
+      .png({ quality: quality }) // Ajustar la calidad (cuanto menor, más comprimida)
       .toBuffer(); // Convertir a buffer
 
     const compressedBase64 = `data:image/jpeg;base64,${image.toString('base64')}`;
