@@ -82,6 +82,36 @@ export class AuthService {
     };
   }
 
+  async refreshToken(token: string): Promise<IAuthRes> {
+    const payload = this.jwtService.verify(token, {
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+
+    if (!payload) {
+      throw new Error('Invalid token');
+    }
+
+    const user = await this.userService.findBydId(payload.id);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // generate token
+    const tokens = this.generateToken(user.id);
+
+    return {
+      user: {
+        name: user.name,
+        avatar: {
+          original_link: user.avatar.original_link,
+          min_link: user.avatar.min_link,
+        },
+      },
+      ...tokens,
+    };
+  }
+
   async me(id: number) {
     const user = await this.userService.findBydId(id);
 

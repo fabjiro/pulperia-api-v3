@@ -8,7 +8,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthLoginReqDto } from './dto/auth.req.dto';
+import { AuthLoginReqDto, AuthRefreshTokenReqDto } from './dto/auth.req.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { RegisterUserDto } from '../user/dto/user.dto';
 
@@ -20,6 +20,16 @@ export class AuthController {
   async login(@Body() createAuthDto: AuthLoginReqDto) {
     try {
       return await this.authService.login(createAuthDto);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Post('refresh-token')
+  @UseGuards(JwtAuthGuard)
+  refreshToken(@Body() refreshToken: AuthRefreshTokenReqDto) {
+    try {
+      return this.authService.refreshToken(refreshToken.refreshToken);
     } catch (error) {
       throw new NotFoundException(error.toString());
     }

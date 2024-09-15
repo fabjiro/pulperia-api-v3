@@ -16,7 +16,7 @@ import { ProductModule } from './product/product.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.POSTGRES_URL, //  + '?sslmode=require' or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
+      url: process.env.POSTGRES_URL + '?sslmode=require', //  + '?sslmode=require' or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
       entities: ['./dist/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true,

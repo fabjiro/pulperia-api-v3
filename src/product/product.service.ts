@@ -68,11 +68,11 @@ export class ProductService {
 
       return await this.productRepository.find({
         where: { status: statusDb },
-        relations: ['status', 'image'],
+        relations: ['status', 'image', 'category'],
       });
     }
     return await this.productRepository.find({
-      relations: ['status', 'image'],
+      relations: ['status', 'image', 'category'],
     });
   }
 

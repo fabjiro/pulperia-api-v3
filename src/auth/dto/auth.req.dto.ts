@@ -8,3 +8,8 @@ export class AuthLoginReqDto {
   @IsNotEmpty({ message: 'El campo password es requerido' })
   password: string;
 }
+
+export class AuthRefreshTokenReqDto {
+  @IsNotEmpty({ message: 'El campo refreshToken es requerido' })
+  refreshToken: string;
+}

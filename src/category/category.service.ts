@@ -16,7 +16,7 @@ export class CategoryService {
 
   async create(category: ICreateCategory) {
     const status = await this.statusService.findOne(
-      category.status ?? STATUSENUM.DISABLED,
+      category.status ?? STATUSENUM.REVIEW,
     );
 
     const newCategory = this.categoryRepository.create({
