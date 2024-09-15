@@ -8,9 +8,10 @@ import {
   Query,
   Delete,
   Param,
+  Put,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/create-product.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { Roles } from '../rol/decorators/rols.decorator';
 import { RolesGuard } from '../rol/guards/role.guard';
@@ -20,6 +21,20 @@ import { RolEnum } from '../rol/enum/RolEnum';
 @UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Put(':id')
+  @Roles(RolEnum.ADMIN)
+  @UseGuards(RolesGuard)
+  async update(
+    @Param('id') id: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    try {
+      return await this.productService.update(updateProductDto, id);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 
   @Post()
   @Roles(RolEnum.ADMIN)

@@ -48,27 +48,50 @@ export class ImageService {
     return await this.imageRepository.findOne({ where: { id } });
   }
 
-  async saveImage(base64?: string): Promise<Image | null> {
+  async saveImage(base64?: string) {
     try {
       if (!base64) return null;
 
       const minImage = await this.compressImage(base64);
 
       const [imageOriginal, imageMin] = await Promise.all([
-        this.postImage(base64),
-        this.postImage(minImage),
+        this.uploadImage(base64),
+        this.uploadImage(minImage),
       ]);
 
-      const newImage = this.imageRepository.create({
-        original_link: imageOriginal.link,
-        min_link: imageMin.link,
-      });
-
-      return await this.imageRepository.save(newImage);
+      return {
+        imageOriginal,
+        imageMin,
+      };
     } catch (error) {
       console.log(error);
       throw new Error('Error al subir la imagen');
     }
+  }
+
+  async create(base64?: string): Promise<Image | null> {
+    const { imageOriginal, imageMin } = await this.saveImage(base64);
+
+    const newImage = this.imageRepository.create({
+      original_link: imageOriginal.link,
+      min_link: imageMin.link,
+    });
+
+    return await this.imageRepository.save(newImage);
+  }
+  async update(image: Image, base64?: string) {
+    if (!base64) {
+      throw new Error('Base64 is required');
+    }
+
+    const { imageOriginal, imageMin } = await this.saveImage(base64);
+
+    await this.imageRepository.update(image.id, {
+      original_link: imageOriginal.link,
+      min_link: imageMin.link,
+    });
+
+    return await this.findById(image.id);
   }
 
   async compressImage(
@@ -85,7 +108,7 @@ export class ImageService {
     return compressedBase64;
   }
 
-  async postImage(base64: string): Promise<ImagePostRes> {
+  async uploadImage(base64: string): Promise<ImagePostRes> {
     const { data } = await this.axiosInstance.post('/file', {
       file: base64,
     });

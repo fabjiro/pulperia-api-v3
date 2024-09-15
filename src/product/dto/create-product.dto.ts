@@ -13,3 +13,14 @@ export class CreateProductDto {
   @IsOptional()
   status?: number;
 }
+
+export class UpdateProductDto {
+  @IsOptional()
+  name?: string;
+  @IsOptional()
+  image?: string;
+  @IsOptional()
+  category?: number;
+  @IsOptional()
+  status?: number;
+}

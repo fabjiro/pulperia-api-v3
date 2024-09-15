@@ -27,7 +27,7 @@ export class AuthService {
       userData.password,
     );
 
-    const avatar = await this.imageService.saveImage(userData.avatar);
+    const avatar = await this.imageService.create(userData.avatar);
     const avatarLocal = await this.imageService.findById(avatar.id ?? 0);
 
     const newUser = await this.userService.add({

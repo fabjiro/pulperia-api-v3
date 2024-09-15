@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StatusService } from '../status/status.service';
 import { ImageService } from '../image/image.service';
-import { ICreateProduct } from './interface/product.interface';
+import { ICreateProduct, IUpdateProduct } from './interface/product.interface';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { CategoryService } from '../category/category.service';
 
@@ -17,6 +17,61 @@ export class ProductService {
     private readonly imageService: ImageService,
     private readonly categoryService: CategoryService,
   ) {}
+
+  async update(updateProductDto: IUpdateProduct, id: number) {
+    const product = await this.findOne(id);
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    if (updateProductDto.name) {
+      product.name = updateProductDto.name;
+    }
+
+    if (updateProductDto.status) {
+      const status = await this.statusService.findOne(updateProductDto.status);
+      if (!status) {
+        throw new Error('Status not found');
+      }
+      product.status = status;
+    }
+
+    if (updateProductDto.category) {
+      const category = await this.categoryService.findOne(
+        updateProductDto.category,
+      );
+
+      if (!category) {
+        throw new Error('Category not found');
+      }
+
+      product.category = category;
+    }
+
+    if (updateProductDto.image) {
+      await Promise.all([
+        this.imageService.deleteImagePost(product.image.original_link),
+        this.imageService.deleteImagePost(product.image.min_link),
+        this.imageService.update(product.image, updateProductDto.image),
+      ]);
+    }
+
+    await this.productRepository.update(id, {
+      name: product.name,
+      status: {
+        id: product.status?.id,
+      },
+      category: {
+        id: product.category?.id,
+      },
+      image: {
+        id: product.image?.id,
+      },
+    });
+
+    return await this.findOne(id);
+  }
 
   async deleteById(id: number) {
     const product = await this.findOne(id);
@@ -45,7 +100,7 @@ export class ProductService {
     );
 
     // post image
-    const image = await this.imageService.saveImage(createProductDto.image);
+    const image = await this.imageService.create(createProductDto.image);
 
     // create product
     const newProduct = this.productRepository.create({
@@ -79,7 +134,7 @@ export class ProductService {
   async findOne(id: number) {
     return await this.productRepository.findOne({
       where: { id },
-      relations: ['status', 'image'],
+      relations: ['status', 'image', 'category'],
     });
   }
 }
