@@ -8,9 +8,13 @@ import {
   NotFoundException,
   Delete,
   Param,
+  Put,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from './dto/create-category.dto';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { Roles } from '../rol/decorators/rols.decorator';
 import { RolEnum } from '../rol/enum/RolEnum';
@@ -20,6 +24,20 @@ import { RolesGuard } from '../rol/guards/role.guard';
 @UseGuards(JwtAuthGuard)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
+
+  @Put(':id')
+  @Roles(RolEnum.ADMIN)
+  @UseGuards(RolesGuard)
+  async update(
+    @Param('id') id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    try {
+      return await this.categoryService.update(updateCategoryDto, id);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 
   @Post()
   @Roles(RolEnum.ADMIN)

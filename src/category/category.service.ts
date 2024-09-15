@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ICreateCategory } from './interface/ICategory';
+import { ICreateCategory, IUpdateCategory } from './interface/ICategory';
 import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
 
@@ -13,6 +13,37 @@ export class CategoryService {
     private readonly categoryRepository: Repository<Category>,
     private readonly statusService: StatusService,
   ) {}
+
+  async update(category: IUpdateCategory, id: number) {
+    const categoryLocal = await this.findOne(id);
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    if (category.status) {
+      const status = await this.statusService.findOne(category.status);
+
+      if (!status) {
+        throw new Error('Status not found');
+      }
+
+      categoryLocal.status = status;
+    }
+
+    if (category.name) {
+      categoryLocal.name = category.name;
+    }
+
+    await this.categoryRepository.update(id, {
+      name: categoryLocal.name,
+      status: {
+        id: categoryLocal.status?.id,
+      },
+    });
+
+    return await this.findOne(id);
+  }
 
   async create(category: ICreateCategory) {
     const status = await this.statusService.findOne(

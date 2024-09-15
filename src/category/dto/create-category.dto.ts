@@ -7,3 +7,11 @@ export class CreateCategoryDto {
   @IsOptional()
   status?: number;
 }
+
+export class UpdateCategoryDto {
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  status?: number;
+}
