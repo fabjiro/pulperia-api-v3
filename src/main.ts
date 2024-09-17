@@ -13,7 +13,7 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 
 dotenv.config();
