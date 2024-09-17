@@ -7,6 +7,7 @@ import { ImageService } from '../image/image.service';
 import { ICreateProduct, IUpdateProduct } from './interface/product.interface';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { CategoryService } from '../category/category.service';
+import { IMAGEENUM } from '../image/enum/image.enum';
 
 @Injectable()
 export class ProductService {
@@ -19,7 +20,7 @@ export class ProductService {
   ) {}
 
   async update(updateProductDto: IUpdateProduct, id: number) {
-    const product = await this.findOne(id);
+    const product = await this.findOne(id, true);
 
     if (!product) {
       throw new Error('Product not found');
@@ -99,16 +100,23 @@ export class ProductService {
       createProductDto.status ?? STATUSENUM.REVIEW,
     );
 
-    // post image
-    const image = await this.imageService.create(createProductDto.image);
-
     // create product
     const newProduct = this.productRepository.create({
       ...createProductDto,
       category,
       status,
-      image,
+      image: null,
     });
+
+    if (createProductDto.image) {
+      const image = await this.imageService.create(createProductDto.image);
+      newProduct.image = image;
+    } else {
+      const defaultImage = await this.imageService.findById(
+        IMAGEENUM.DEFAULTPRODUCT,
+      );
+      newProduct.image = defaultImage;
+    }
 
     return await this.productRepository.save(newProduct);
   }
@@ -131,10 +139,10 @@ export class ProductService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, relation: boolean = false) {
     return await this.productRepository.findOne({
       where: { id },
-      relations: ['status', 'image', 'category'],
+      relations: relation ? ['status', 'image', 'category'] : [],
     });
   }
 }

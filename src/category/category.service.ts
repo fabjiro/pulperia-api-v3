@@ -15,7 +15,7 @@ export class CategoryService {
   ) {}
 
   async update(category: IUpdateCategory, id: number) {
-    const categoryLocal = await this.findOne(id);
+    const categoryLocal = await this.findOne(id, true);
 
     if (!category) {
       throw new Error('Category not found');
@@ -76,15 +76,15 @@ export class CategoryService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, relation: boolean = false) {
     return await this.categoryRepository.findOne({
       where: { id },
-      relations: ['status', 'products'],
+      relations: relation ? ['status', 'products'] : [],
     });
   }
 
   async deleteById(id: number) {
-    const category = await this.findOne(id);
+    const category = await this.findOne(id, true);
 
     if (!category) {
       throw new Error('Category not found');

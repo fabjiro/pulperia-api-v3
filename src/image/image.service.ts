@@ -70,6 +70,8 @@ export class ImageService {
   }
 
   async create(base64?: string): Promise<Image | null> {
+    if (!base64) return;
+
     const { imageOriginal, imageMin } = await this.saveImage(base64);
 
     const newImage = this.imageRepository.create({

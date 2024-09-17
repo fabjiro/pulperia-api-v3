@@ -4,11 +4,11 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @IsNotEmpty({ message: 'Image is required' })
-  image: string;
-
   @IsNotEmpty({ message: 'Category is required' })
   category: number;
+
+  @IsOptional()
+  image?: string;
 
   @IsOptional()
   status?: number;

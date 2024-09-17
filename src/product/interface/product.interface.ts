@@ -1,7 +1,7 @@
 export interface ICreateProduct {
   name: string;
-  image: string;
   category: number;
+  image?: string;
   status?: number;
 }
 
