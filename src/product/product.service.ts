@@ -51,11 +51,17 @@ export class ProductService {
     }
 
     if (updateProductDto.image) {
-      await Promise.all([
-        this.imageService.deleteImagePost(product.image.original_link),
-        this.imageService.deleteImagePost(product.image.min_link),
-        this.imageService.update(product.image, updateProductDto.image),
-      ]);
+      const newImage = await this.imageService.create(updateProductDto.image);
+
+      await this.productRepository.update(id, {
+        image: {
+          id: newImage.id,
+        },
+      });
+
+      await this.imageService.deleteById(product.image.id);
+
+      product.image = newImage;
     }
 
     await this.productRepository.update(id, {
@@ -75,7 +81,7 @@ export class ProductService {
   }
 
   async deleteById(id: number) {
-    const product = await this.findOne(id);
+    const product = await this.findOne(id, true);
 
     if (!product) {
       throw new Error('Product not found');

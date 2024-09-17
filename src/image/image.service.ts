@@ -5,6 +5,7 @@ import { Image } from './entity/image.entity';
 import { ImagePostRes } from './dto/image.dto';
 import * as sharp from 'sharp';
 import axios, { AxiosInstance } from 'axios';
+import { IMAGEENUM } from './enum/image.enum';
 
 const uuidRegex =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
@@ -34,6 +35,13 @@ export class ImageService {
 
     if (!image) {
       throw new Error('Image not found');
+    }
+
+    if (
+      image.id === IMAGEENUM.DEFAULTPRODUCT ||
+      image.id === IMAGEENUM.DEFAULTUSER
+    ) {
+      return;
     }
 
     await Promise.all([
