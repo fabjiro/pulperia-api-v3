@@ -78,16 +78,21 @@ export class ImageService {
   }
 
   async create(base64?: string): Promise<Image | null> {
-    if (!base64) return;
+    try {
+      if (!base64) return;
 
-    const { imageOriginal, imageMin } = await this.saveImage(base64);
+      const { imageOriginal, imageMin } = await this.saveImage(base64);
 
-    const newImage = this.imageRepository.create({
-      original_link: imageOriginal.link,
-      min_link: imageMin.link,
-    });
+      const newImage = this.imageRepository.create({
+        original_link: imageOriginal.link,
+        min_link: imageMin.link,
+      });
 
-    return await this.imageRepository.save(newImage);
+      return await this.imageRepository.save(newImage);
+    } catch (error) {
+      console.log(error);
+      throw new Error('Error al subir la imagen');
+    }
   }
   async update(image: Image, base64?: string) {
     if (!base64) {
@@ -119,9 +124,15 @@ export class ImageService {
   }
 
   async uploadImage(base64: string): Promise<ImagePostRes> {
-    const { data } = await this.axiosInstance.post('/file', {
-      file: base64,
-    });
+    const { data } = await this.axiosInstance.post(
+      '/file',
+      {
+        file: base64,
+      },
+      {
+        timeout: 60000, // 60 seconds
+      },
+    );
 
     return data as ImagePostRes;
   }
