@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { ICreateCategory, IUpdateCategory } from './interface/ICategory';
 import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
+import { ImageService } from '../image/image.service';
+import { IMAGEENUM } from '../image/enum/image.enum';
 
 @Injectable()
 export class CategoryService {
@@ -12,6 +14,7 @@ export class CategoryService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     private readonly statusService: StatusService,
+    private readonly imageService: ImageService,
   ) {}
 
   async update(category: IUpdateCategory, id: number) {
@@ -50,9 +53,12 @@ export class CategoryService {
       category.status ?? STATUSENUM.REVIEW,
     );
 
+    const image = await this.imageService.findById(IMAGEENUM.DEFAULTCATEGORY);
+
     const newCategory = this.categoryRepository.create({
       name: category.name,
       status,
+      image,
     });
 
     return await this.categoryRepository.save(newCategory);
@@ -68,11 +74,13 @@ export class CategoryService {
 
       return await this.categoryRepository.find({
         where: { status: statusDb },
-        relations: products ? ['status', 'products'] : ['status'],
+        relations: products
+          ? ['status', 'products', 'image']
+          : ['status', 'image'],
       });
     }
     return await this.categoryRepository.find({
-      relations: ['status'],
+      relations: ['status', 'image'],
     });
   }
 

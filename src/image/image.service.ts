@@ -56,7 +56,7 @@ export class ImageService {
     return await this.imageRepository.findOne({ where: { id } });
   }
 
-  async saveImage(base64?: string) {
+  async saveOnCloundImage(base64?: string) {
     try {
       if (!base64) return null;
 
@@ -81,7 +81,7 @@ export class ImageService {
     try {
       if (!base64) return;
 
-      const { imageOriginal, imageMin } = await this.saveImage(base64);
+      const { imageOriginal, imageMin } = await this.saveOnCloundImage(base64);
 
       const newImage = this.imageRepository.create({
         original_link: imageOriginal.link,
@@ -99,7 +99,7 @@ export class ImageService {
       throw new Error('Base64 is required');
     }
 
-    const { imageOriginal, imageMin } = await this.saveImage(base64);
+    const { imageOriginal, imageMin } = await this.saveOnCloundImage(base64);
 
     await this.imageRepository.update(image.id, {
       original_link: imageOriginal.link,

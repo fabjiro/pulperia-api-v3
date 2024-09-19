@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
+import { Category } from '../../category/entities/category.entity';
 
 @Entity()
 export class Image {
@@ -15,6 +16,9 @@ export class Image {
   @Column()
   @IsNotEmpty()
   min_link: string;
+
+  @OneToMany(() => Category, (category) => category.image)
+  categories: User[];
 
   @OneToMany(() => User, (user) => user.avatar)
   users: User[];

@@ -5,9 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { StatusModule } from '../status/status.module';
 import { UserModule } from '../user/user.module';
+import { ImageModule } from '../image/image.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category]), StatusModule, UserModule],
+  imports: [
+    TypeOrmModule.forFeature([Category]),
+    StatusModule,
+    UserModule,
+    ImageModule,
+  ],
   controllers: [CategoryController],
   providers: [CategoryService],
   exports: [CategoryService],
