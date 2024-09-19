@@ -62,9 +62,21 @@ export class CategoryController {
   }
 
   @Get()
-  async findAll(@Query('status') status?: number) {
+  async findAll(
+    @Query('status') status?: number,
+    @Query('products') products?: boolean,
+  ) {
     try {
-      return await this.categoryService.findAll(status);
+      return await this.categoryService.findAll(status, products);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: number) {
+    try {
+      return await this.categoryService.findOne(id, true);
     } catch (error) {
       throw new NotFoundException(error.toString());
     }

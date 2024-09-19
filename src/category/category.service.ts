@@ -58,7 +58,7 @@ export class CategoryService {
     return await this.categoryRepository.save(newCategory);
   }
 
-  async findAll(status?: number) {
+  async findAll(status?: number, products?: boolean) {
     if (status) {
       const statusDb = await this.statusService.findOne(status);
 
@@ -68,7 +68,7 @@ export class CategoryService {
 
       return await this.categoryRepository.find({
         where: { status: statusDb },
-        relations: ['status'],
+        relations: products ? ['status', 'products'] : ['status'],
       });
     }
     return await this.categoryRepository.find({
