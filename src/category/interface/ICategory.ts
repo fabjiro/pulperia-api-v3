@@ -6,6 +6,7 @@ export interface ICreateCategory {
 export interface IUpdateCategory {
   name?: string;
   status?: number;
+  image?: string;
 }
 
 export interface IGetCategoryFilter {

@@ -81,4 +81,15 @@ export class CategoryController {
       throw new NotFoundException(error.toString());
     }
   }
+
+  @Put(':id/generate')
+  @Roles(RolEnum.ADMIN)
+  @UseGuards(RolesGuard)
+  async addProducts(@Param('id') id: number) {
+    try {
+      return await this.categoryService.generateImages(id);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 }

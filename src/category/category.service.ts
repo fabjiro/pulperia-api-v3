@@ -7,6 +7,7 @@ import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { ImageService } from '../image/image.service';
 import { IMAGEENUM } from '../image/enum/image.enum';
+import { GeneratorUtils } from '../utils/generator.utils';
 
 @Injectable()
 export class CategoryService {
@@ -38,10 +39,27 @@ export class CategoryService {
       categoryLocal.name = category.name;
     }
 
+    if (category.image) {
+      const newImage = await this.imageService.create(category.image);
+
+      await this.categoryRepository.update(id, {
+        image: {
+          id: newImage.id,
+        },
+      });
+
+      await this.imageService.deleteById(categoryLocal.image.id);
+
+      categoryLocal.image = newImage;
+    }
+
     await this.categoryRepository.update(id, {
       name: categoryLocal.name,
       status: {
         id: categoryLocal.status?.id,
+      },
+      image: {
+        id: categoryLocal.image?.id,
       },
     });
 
@@ -87,7 +105,9 @@ export class CategoryService {
   async findOne(id: number, relation: boolean = false) {
     return await this.categoryRepository.findOne({
       where: { id },
-      relations: relation ? ['status', 'products'] : [],
+      relations: relation
+        ? ['status', 'products', 'image', 'products.image']
+        : [],
     });
   }
 
@@ -103,5 +123,34 @@ export class CategoryService {
     }
 
     return await this.categoryRepository.remove(category);
+  }
+
+  async generateImages(categoryId: number) {
+    const category = await this.findOne(categoryId, true);
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    const images = category.products.map((product) => product.image.min_link);
+
+    if (images.length === 0) {
+      throw new Error('Category has no products');
+    }
+
+    const randomImage = images.sort(() => 0.5 - Math.random());
+    const imageToGrid = randomImage.slice(0, 4);
+
+    const gridImage =
+      await GeneratorUtils.createImageGridAndGetBase64(imageToGrid);
+
+    await this.update(
+      {
+        image: gridImage,
+      },
+      categoryId,
+    );
+
+    return await this.findOne(categoryId, true);
   }
 }

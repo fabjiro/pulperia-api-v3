@@ -2,7 +2,8 @@ import { DownloandUtils } from './downloand.utils';
 import * as sharp from 'sharp';
 
 export class GeneratorUtils {
-  static async createImageGrid(urls) {
+  // Función para combinar imágenes y obtener Base64
+  static async createImageGridAndGetBase64(urls) {
     // Llenar espacios vacíos con null si hay menos de 4 URLs
     while (urls.length < 4) {
       urls.push(null);
@@ -12,16 +13,23 @@ export class GeneratorUtils {
     const images = await Promise.all(
       urls.map(async (url) => {
         if (url) {
-          const img = await DownloandUtils.downloadImage(url);
-          return sharp(img).resize(300, 300).toBuffer();
+          const img = await DownloandUtils.downloadImage(url); // Suponiendo que tienes esta función implementada
+          return sharp(img)
+            .resize({
+              width: 300,
+              height: 300,
+              fit: 'contain', // Ajustar la imagen sin distorsión
+              background: { r: 255, g: 255, b: 255, alpha: 0 }, // Fondo transparente
+            })
+            .toBuffer();
         } else {
-          // Crear un buffer de una imagen en blanco
+          // Crear un buffer de una imagen con fondo blanco
           return sharp({
             create: {
               width: 300,
               height: 300,
               channels: 4,
-              background: { r: 255, g: 255, b: 255, alpha: 1 }, // Fondo blanco
+              background: { r: 255, g: 255, b: 255, alpha: 0 }, // Fondo blanco
             },
           })
             .png()
@@ -30,13 +38,13 @@ export class GeneratorUtils {
       }),
     );
 
-    // Combinar las imágenes en una cuadrícula 2x2
-    const combinedImage = await sharp({
+    // Combinar las imágenes en una cuadrícula 2x2 y obtener el buffer
+    const combinedImageBuffer = await sharp({
       create: {
         width: 600, // 2 imágenes de ancho
         height: 600, // 2 imágenes de alto
         channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 }, // Fondo blanco
+        background: { r: 255, g: 255, b: 255, alpha: 0 }, // Fondo transparente
       },
     })
       .composite([
@@ -45,8 +53,12 @@ export class GeneratorUtils {
         { input: images[2], top: 300, left: 0 },
         { input: images[3], top: 300, left: 300 },
       ])
-      .toFile('output-grid-image.png'); // Guardar la imagen generada
+      .png() // Exportar como PNG
+      .toBuffer(); // Obtener el buffer de la imagen combinada
 
-    return combinedImage;
+    // Convertir el buffer a Base64
+    const base64Image = combinedImageBuffer.toString('base64');
+
+    return `data:image/png;base64,${base64Image}`;
   }
 }

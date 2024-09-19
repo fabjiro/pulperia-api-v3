@@ -6,6 +6,7 @@ export class DownloandUtils {
       url,
       responseType: 'arraybuffer',
     });
+
     return Buffer.from(response.data, 'binary');
   }
 }

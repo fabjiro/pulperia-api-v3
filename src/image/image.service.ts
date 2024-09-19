@@ -39,7 +39,8 @@ export class ImageService {
 
     if (
       image.id === IMAGEENUM.DEFAULTPRODUCT ||
-      image.id === IMAGEENUM.DEFAULTUSER
+      image.id === IMAGEENUM.DEFAULTUSER ||
+      image.id === IMAGEENUM.DEFAULTCATEGORY
     ) {
       return;
     }
