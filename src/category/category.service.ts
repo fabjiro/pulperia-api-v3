@@ -139,10 +139,10 @@ export class CategoryService {
     }
 
     const randomImage = images.sort(() => 0.5 - Math.random());
-    const imageToGrid = randomImage.slice(0, 4);
+    const imageToGrid = randomImage.slice(0, 5);
 
     const gridImage =
-      await GeneratorUtils.createImageGridAndGetBase64(imageToGrid);
+      await GeneratorUtils.createSuperposedImageAndGetBase64(imageToGrid);
 
     await this.update(
       {
