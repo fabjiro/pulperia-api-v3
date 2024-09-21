@@ -6,10 +6,12 @@ import { Category } from './entities/category.entity';
 import { StatusModule } from '../status/status.module';
 import { UserModule } from '../user/user.module';
 import { ImageModule } from '../image/image.module';
+import { Product } from '../product/entities/product.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Category]),
+    TypeOrmModule.forFeature([Product]),
     StatusModule,
     UserModule,
     ImageModule,

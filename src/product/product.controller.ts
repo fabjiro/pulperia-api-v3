@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../guard/auth.guard';
 import { Roles } from '../rol/decorators/rols.decorator';
 import { RolesGuard } from '../rol/guards/role.guard';
 import { RolEnum } from '../rol/enum/RolEnum';
+import { STATUSENUM } from '../status/enum/status.enum';
 
 @Controller('product')
 @UseGuards(JwtAuthGuard)
@@ -59,7 +60,21 @@ export class ProductController {
   }
 
   @Get()
-  findAll(@Query('status') status?: number) {
-    return this.productService.findAll(status);
+  async findAll(
+    @Query('status') status?: number,
+    @Query('category') category?: number,
+  ) {
+    try {
+      if (status || category) {
+        return await this.productService.findByFilter({
+          categoryId: category,
+          status: status ?? STATUSENUM.ACTIVE,
+        });
+      }
+
+      return await this.productService.findAll();
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
   }
 }

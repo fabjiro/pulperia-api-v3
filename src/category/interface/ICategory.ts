@@ -12,3 +12,8 @@ export interface IUpdateCategory {
 export interface IGetCategoryFilter {
   actives: boolean;
 }
+
+export interface IGetCountByCategory {
+  status: number;
+  categoryId: number;
+}

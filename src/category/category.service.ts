@@ -2,18 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ICreateCategory, IUpdateCategory } from './interface/ICategory';
+import {
+  ICreateCategory,
+  IGetCountByCategory,
+  IUpdateCategory,
+} from './interface/ICategory';
 import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { ImageService } from '../image/image.service';
 import { IMAGEENUM } from '../image/enum/image.enum';
 import { GeneratorUtils } from '../utils/generator.utils';
+import { Product } from '../product/entities/product.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
     private readonly statusService: StatusService,
     private readonly imageService: ImageService,
   ) {}
@@ -82,7 +89,7 @@ export class CategoryService {
     return await this.categoryRepository.save(newCategory);
   }
 
-  async findAll(status?: number, products?: boolean) {
+  async findAll(status?: number) {
     if (status) {
       const statusDb = await this.statusService.findOne(status);
 
@@ -92,13 +99,24 @@ export class CategoryService {
 
       return await this.categoryRepository.find({
         where: { status: statusDb },
-        relations: products
-          ? ['status', 'products', 'image']
-          : ['status', 'image'],
+        relations: ['status', 'image'],
       });
     }
     return await this.categoryRepository.find({
       relations: ['status', 'image'],
+    });
+  }
+
+  async getCountProductByCategory(data: IGetCountByCategory) {
+    return await this.productRepository.count({
+      where: {
+        category: {
+          id: data.categoryId,
+        },
+        status: {
+          id: data.status,
+        },
+      },
     });
   }
 

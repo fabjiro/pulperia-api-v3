@@ -11,3 +11,8 @@ export interface IUpdateProduct {
   category?: number;
   status?: number;
 }
+
+export interface IProductGet {
+  status?: number;
+  categoryId?: number;
+}

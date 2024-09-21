@@ -1,4 +1,4 @@
-import { IsBase64, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class RegisterUserDto {
   @IsNotEmpty({ message: 'El campo nombre es requerido' })

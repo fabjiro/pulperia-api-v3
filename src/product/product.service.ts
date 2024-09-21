@@ -4,7 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StatusService } from '../status/status.service';
 import { ImageService } from '../image/image.service';
-import { ICreateProduct, IUpdateProduct } from './interface/product.interface';
+import {
+  ICreateProduct,
+  IProductGet,
+  IUpdateProduct,
+} from './interface/product.interface';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { CategoryService } from '../category/category.service';
 import { IMAGEENUM } from '../image/enum/image.enum';
@@ -127,19 +131,45 @@ export class ProductService {
     return await this.productRepository.save(newProduct);
   }
 
-  async findAll(status?: number) {
+  async findByFilter(query: IProductGet) {
+    const { status, categoryId } = query;
+
     if (status) {
       const statusDb = await this.statusService.findOne(status);
 
       if (!statusDb) {
         throw new Error('Status not found');
       }
-
-      return await this.productRepository.find({
-        where: { status: statusDb },
-        relations: ['status', 'image', 'category'],
-      });
     }
+
+    if (categoryId) {
+      const category = await this.categoryService.findOne(categoryId);
+
+      if (!category) {
+        throw new Error('Category not found');
+      }
+    }
+
+    console.log(status, categoryId);
+
+    return await this.productRepository.find({
+      where: {
+        ...(status !== null && {
+          status: {
+            id: status,
+          },
+        }),
+        ...(categoryId !== null && {
+          category: {
+            id: categoryId,
+          },
+        }),
+      },
+      relations: ['status', 'image'],
+    });
+  }
+
+  async findAll() {
     return await this.productRepository.find({
       relations: ['status', 'image', 'category'],
     });
