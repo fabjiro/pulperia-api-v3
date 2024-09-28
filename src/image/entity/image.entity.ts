@@ -18,7 +18,7 @@ export class Image {
   min_link: string;
 
   @OneToMany(() => Category, (category) => category.image)
-  categories: User[];
+  categories: Category[];
 
   @OneToMany(() => User, (user) => user.avatar)
   users: User[];

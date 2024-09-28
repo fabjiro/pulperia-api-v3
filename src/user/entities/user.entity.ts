@@ -1,7 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { IsNotEmpty, IsEmail } from 'class-validator';
 import { Rol } from '../../rol/entity/rol.entity';
 import { Image } from '../../image/entity/image.entity';
+import { Pulperia } from '../../pulperia/entities/pulperia.entity';
 
 @Entity()
 export class User {
@@ -26,4 +33,10 @@ export class User {
 
   @ManyToOne(() => Image, (image) => image.users)
   avatar: Image;
+
+  @OneToMany(() => Pulperia, (pulperia) => pulperia.owner)
+  pulperiasAsOwner: Pulperia[];
+
+  @OneToMany(() => Pulperia, (pulperia) => pulperia.creator)
+  pulperiasAsCreator: Pulperia[];
 }

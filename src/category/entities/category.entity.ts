@@ -22,9 +22,9 @@ export class Category {
   @ManyToOne(() => Image, (image) => image.categories)
   image: Image;
 
-  @ManyToOne(() => Status, (status) => status.categories) // Relación muchos-a-uno con Status
+  @ManyToOne(() => Status, (status) => status.categories)
   status: Status;
 
-  @OneToMany(() => Product, (product) => product.category) // Relación uno-a-muchos con Product
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 }
