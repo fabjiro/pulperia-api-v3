@@ -9,6 +9,7 @@ import {
 import { Point } from 'geojson';
 import { IsNotEmpty } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
+import { Status } from '../../status/entities/status.entity';
 
 @Entity()
 export class Pulperia {
@@ -26,6 +27,9 @@ export class Pulperia {
   @ManyToOne(() => User, (user) => user.pulperiasAsCreator)
   @IsNotEmpty()
   creator: User;
+
+  @ManyToOne(() => Status, (status) => status.pulperias)
+  status: Status;
 
   @Column({
     type: 'geometry',
