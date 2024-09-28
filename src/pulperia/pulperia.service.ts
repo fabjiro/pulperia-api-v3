@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { IPulperiaCreate } from './interface/pulperia.interface';
 import { ICoordinates } from './interface/coordinates.interface';
 import { UserService } from '../user/user.service';
+import { STATUSENUM } from '../status/enum/status.enum';
 
 @Injectable()
 export class PulperiaService {
@@ -36,8 +37,16 @@ export class PulperiaService {
       throw new Error('Creator not found');
     }
 
+    const status = await this.userService.findBydId(
+      createPulperiaDto.statusId ?? STATUSENUM.REVIEW,
+    );
+    if (!status) {
+      throw new Error('Status not found');
+    }
+
     const createdPulperia = this.pulperiaRepository.create({
       ...createPulperiaDto,
+      status,
       owner,
       creator,
     });
