@@ -13,8 +13,8 @@ export class CreatePulperiaDto {
   @IsOptional()
   creator?: number;
 
-  @IsArray({ message: 'Corrdenadas deben ser arreglos' })
-  @IsNotEmpty({ message: 'Corrdenadas son requeridas' })
-  @IsNumber({}, { each: true, message: 'Corrdenadas deben ser numericas' })
+  @IsArray({ message: 'coordinates deben ser arreglos' })
+  @IsNotEmpty({ message: 'coordinates son requeridas' })
+  @IsNumber({}, { each: true, message: 'coordinates deben ser numericas' })
   coordinates: [number, number]; // [longitude, latitude]
 }
