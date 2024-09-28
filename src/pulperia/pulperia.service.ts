@@ -66,8 +66,28 @@ export class PulperiaService {
   async findLocationsWithinRadius(
     corrdinate: ICoordinates,
     radius: number = 5,
+    status?: number,
   ): Promise<Pulperia[]> {
     const { lat, lng } = corrdinate;
+
+    if (status) {
+      const statusByid = await this.statusService.findOne(status);
+
+      if (!statusByid) {
+        throw new Error('Status not found');
+      }
+
+      return await this.pulperiaRepository.query(
+        `SELECT * FROM pulperia
+         WHERE ST_DWithin(
+           coordinates::geography,
+           ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+           $3
+         ) AND "statusId" = $4`,
+        [lat, lng, radius, status],
+      );
+    }
+
     return await this.pulperiaRepository.query(
       `SELECT * FROM pulperia
          WHERE ST_DWithin(
@@ -77,5 +97,16 @@ export class PulperiaService {
          )`,
       [lat, lng, radius], // Recuerda: [longitud, latitud]
     );
+  }
+
+  async findPulperiaByUser(idUser: number) {
+    const user = await this.userService.findBydId(idUser);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return await this.pulperiaRepository.find({
+      where: { owner: { id: idUser } },
+      relations: ['status'],
+    });
   }
 }

@@ -11,6 +11,7 @@ import {
 import { PulperiaService } from './pulperia.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { CreatePulperiaDto } from './dto/pulperia.dto';
+import { PulperiaResDto } from './dto/pulperia.dto.res';
 
 @Controller('pulperia')
 export class PulperiaController {
@@ -42,6 +43,7 @@ export class PulperiaController {
     @Query('lat') lat: number,
     @Query('lng') lng: number,
     @Query('radius') radius?: number,
+    @Query('status') status?: number,
   ) {
     try {
       return await this.pulperiaService.findLocationsWithinRadius(
@@ -50,6 +52,23 @@ export class PulperiaController {
           lng,
         },
         radius,
+        status,
+      );
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  async myPulperia(@Request() req): Promise<PulperiaResDto[]> {
+    try {
+      return (await this.pulperiaService.findPulperiaByUser(req.user.id)).map(
+        (pulperia) => ({
+          id: pulperia.id,
+          name: pulperia.name,
+          status: pulperia.status,
+        }),
       );
     } catch (error) {
       throw new NotFoundException(error.toString());
