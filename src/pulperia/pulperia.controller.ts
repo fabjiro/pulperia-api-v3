@@ -5,21 +5,19 @@ import {
   UseGuards,
   Request,
   NotFoundException,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { PulperiaService } from './pulperia.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
-import { Roles } from '../rol/decorators/rols.decorator';
-import { RolEnum } from '../rol/enum/RolEnum';
-import { RolesGuard } from '../rol/guards/role.guard';
 import { CreatePulperiaDto } from './dto/pulperia.dto';
 
 @Controller('pulperia')
-@UseGuards(JwtAuthGuard)
 export class PulperiaController {
   constructor(private readonly pulperiaService: PulperiaService) {}
+
   @Post()
-  @Roles(RolEnum.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   async create(@Request() req, @Body() createPulperia: CreatePulperiaDto) {
     try {
       const currentUser = req.user.id;
@@ -34,6 +32,25 @@ export class PulperiaController {
           lng: createPulperia.coordinates[1],
         },
       });
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Get('by-radius')
+  async findByRadius(
+    @Query('lat') lat: number,
+    @Query('lng') lng: number,
+    @Query('radius') radius?: number,
+  ) {
+    try {
+      return await this.pulperiaService.findLocationsWithinRadius(
+        {
+          lat,
+          lng,
+        },
+        radius,
+      );
     } catch (error) {
       throw new NotFoundException(error.toString());
     }
