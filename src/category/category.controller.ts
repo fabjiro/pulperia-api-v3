@@ -65,9 +65,7 @@ export class CategoryController {
   @Get()
   async findAll(@Query('status') status?: number) {
     try {
-      const allCategorys = await this.categoryService.findAll(
-        status ?? STATUSENUM.ACTIVE,
-      );
+      const allCategorys = await this.categoryService.findAll(status);
 
       return await Promise.all(
         allCategorys.map(async (category) => {
