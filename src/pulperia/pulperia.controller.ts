@@ -70,6 +70,7 @@ export class PulperiaController {
             id: pulperia.id,
             name: pulperia.name,
             status: resultStatus,
+            distance: pulperia.distance,
           };
         }),
       );

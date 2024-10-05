@@ -67,7 +67,7 @@ export class PulperiaService {
     corrdinate: ICoordinates,
     radius: number = 5,
     status?: number,
-  ): Promise<Pulperia[]> {
+  ) {
     const { lat, lng } = corrdinate;
 
     if (status) {
@@ -78,12 +78,20 @@ export class PulperiaService {
       }
 
       return await this.pulperiaRepository.query(
-        `SELECT * FROM pulperia
-         WHERE ST_DWithin(
-           coordinates::geography,
-           ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
-           $3
-         ) AND "statusId" = $4`,
+        `SELECT *,
+       ST_Distance(
+         coordinates::geography,
+         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+       ) AS distance
+FROM pulperia
+WHERE ST_DWithin(
+        coordinates::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+        $3
+      )
+  AND "statusId" = $4
+ORDER BY distance;
+`,
         [lat, lng, radius, status],
       );
     }
