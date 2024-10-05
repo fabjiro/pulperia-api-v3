@@ -12,10 +12,15 @@ import { PulperiaService } from './pulperia.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { CreatePulperiaDto } from './dto/pulperia.dto';
 import { PulperiaResDto } from './dto/pulperia.dto.res';
+import { StatusService } from '../status/status.service';
+import { STATUSENUM } from '../status/enum/status.enum';
 
 @Controller('pulperia')
 export class PulperiaController {
-  constructor(private readonly pulperiaService: PulperiaService) {}
+  constructor(
+    private readonly pulperiaService: PulperiaService,
+    private readonly statusService: StatusService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -46,13 +51,27 @@ export class PulperiaController {
     @Query('status') status?: number,
   ) {
     try {
-      return await this.pulperiaService.findLocationsWithinRadius(
+      const reponse = await this.pulperiaService.findLocationsWithinRadius(
         {
           lat,
           lng,
         },
         radius,
         status,
+      );
+
+      return await Promise.all(
+        reponse.map(async (pulperia) => {
+          const resultStatus = await this.statusService.findOne(
+            status ?? STATUSENUM.REVIEW,
+          );
+
+          return {
+            id: pulperia.id,
+            name: pulperia.name,
+            status: resultStatus,
+          };
+        }),
       );
     } catch (error) {
       throw new NotFoundException(error.toString());
