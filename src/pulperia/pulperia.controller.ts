@@ -71,6 +71,10 @@ export class PulperiaController {
             name: pulperia.name,
             status: resultStatus,
             distance: pulperia.distance,
+            coordinates: {
+              lat: pulperia.latitude,
+              lng: pulperia.longitude,
+            },
           };
         }),
       );

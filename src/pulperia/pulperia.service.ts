@@ -79,6 +79,8 @@ export class PulperiaService {
 
       return await this.pulperiaRepository.query(
         `SELECT *,
+        ST_X(coordinates::geometry) AS latitude,
+       ST_Y(coordinates::geometry) AS longitude,
        ST_Distance(
          coordinates::geography,
          ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
