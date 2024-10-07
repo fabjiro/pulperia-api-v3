@@ -12,9 +12,9 @@ export class PulperiaCategory {
 
   @ManyToOne(() => Pulperia, (pulperia) => pulperia.categorys)
   @JoinColumn({ name: 'pulperia_id' })
-  pulperia: Pulperia;
+  pulperia?: Pulperia;
 
   @ManyToOne(() => Category, (categorie) => categorie.pulperias)
   @JoinColumn({ name: 'categorie_id' })
-  categorie: Category;
+  categorie?: Category;
 }

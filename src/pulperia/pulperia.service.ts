@@ -119,4 +119,8 @@ ORDER BY distance;
       relations: ['status'],
     });
   }
+
+  async findById(id: number) {
+    return await this.pulperiaRepository.findOne({ where: { id } });
+  }
 }
