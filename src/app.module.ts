@@ -10,6 +10,7 @@ import { StatusModule } from './status/status.module';
 import { ProductModule } from './product/product.module';
 import { PulperiaModule } from './pulperia/pulperia.module';
 import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.module';
+import { PulperiaProductModule } from './pulperia-product/pulperia-product.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.mo
       type: 'postgres',
       url: process.env.POSTGRES_URL + '?sslmode=require', //  + '?sslmode=require' or process.env.POSTGRES_URL_NON_POOLING for non-pooling connection
       entities: ['./dist/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: process.env.ENV !== 'prod',
       logging: true,
     }),
     RolModule,
@@ -32,6 +33,7 @@ import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.mo
     ProductModule,
     PulperiaModule,
     PulperiaCategoryModule,
+    PulperiaProductModule,
   ],
 })
 export class AppModule {}

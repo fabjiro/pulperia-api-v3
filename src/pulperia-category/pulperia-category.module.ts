@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PulperiaCategoryService } from './pulperia-category.service';
-import { PulperiaCategoryController } from './pulperia-category.controller';
+import { PulperiaCategory } from './entites/pulperia.categorie.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  controllers: [PulperiaCategoryController],
+  imports: [TypeOrmModule.forFeature([PulperiaCategory])],
   providers: [PulperiaCategoryService],
   exports: [PulperiaCategoryService],
 })

@@ -12,6 +12,7 @@ import { IsNotEmpty } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
 import { Status } from '../../status/entities/status.entity';
 import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
+import { PulperiaProduct } from '../../pulperia-product/entites/pulperia.product.entity';
 
 @Entity()
 export class Pulperia {
@@ -38,6 +39,12 @@ export class Pulperia {
     (pulperiaCategory) => pulperiaCategory.pulperia,
   )
   categorys: PulperiaCategory[];
+
+  @OneToMany(
+    () => PulperiaProduct,
+    (pulperiaProduct) => pulperiaProduct.pulperia,
+  )
+  products: PulperiaProduct[];
 
   @Column({
     type: 'geometry',

@@ -1,8 +1,15 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Image } from '../../image/entity/image.entity';
 import { Status } from '../../status/entities/status.entity';
 import { Category } from '../../category/entities/category.entity';
+import { PulperiaProduct } from '../../pulperia-product/entites/pulperia.product.entity';
 
 @Entity()
 export class Product {
@@ -12,6 +19,12 @@ export class Product {
   @Column()
   @IsNotEmpty()
   name: string;
+
+  @OneToMany(
+    () => PulperiaProduct,
+    (pulperiaProduct) => pulperiaProduct.product,
+  )
+  pulperias: PulperiaProduct[];
 
   @ManyToOne(() => Image, (image) => image.products)
   image: Image;
