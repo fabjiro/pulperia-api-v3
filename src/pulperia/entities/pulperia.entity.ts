@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Point } from 'geojson';
 import { IsNotEmpty } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
 import { Status } from '../../status/entities/status.entity';
+import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
 
 @Entity()
 export class Pulperia {
@@ -30,6 +32,12 @@ export class Pulperia {
 
   @ManyToOne(() => Status, (status) => status.pulperias)
   status: Status;
+
+  @OneToMany(
+    () => PulperiaCategory,
+    (pulperiaCategory) => pulperiaCategory.pulperia,
+  )
+  categorys: PulperiaCategory[];
 
   @Column({
     type: 'geometry',

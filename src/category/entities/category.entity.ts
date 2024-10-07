@@ -9,6 +9,7 @@ import {
 import { Status } from '../../status/entities/status.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Image } from '../../image/entity/image.entity';
+import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
 
 @Entity()
 export class Category {
@@ -18,6 +19,12 @@ export class Category {
   @Column()
   @IsNotEmpty()
   name: string;
+
+  @OneToMany(
+    () => PulperiaCategory,
+    (pulperiaCategory) => pulperiaCategory.categorie,
+  )
+  pulperias: PulperiaCategory[];
 
   @ManyToOne(() => Image, (image) => image.categories)
   image: Image;

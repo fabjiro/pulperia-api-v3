@@ -9,6 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { StatusModule } from './status/status.module';
 import { ProductModule } from './product/product.module';
 import { PulperiaModule } from './pulperia/pulperia.module';
+import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PulperiaModule } from './pulperia/pulperia.module';
     StatusModule,
     ProductModule,
     PulperiaModule,
+    PulperiaCategoryModule,
   ],
 })
 export class AppModule {}
