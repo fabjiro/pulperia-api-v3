@@ -7,6 +7,7 @@ import { ICoordinates } from './interface/coordinates.interface';
 import { UserService } from '../user/user.service';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { StatusService } from '../status/status.service';
+import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
 
 @Injectable()
 export class PulperiaService {
@@ -15,6 +16,7 @@ export class PulperiaService {
     private readonly pulperiaRepository: Repository<Pulperia>,
     private readonly userService: UserService,
     private readonly statusService: StatusService,
+    private readonly pulperiaCategoryService: PulperiaCategoryService,
   ) {}
 
   async create(createPulperiaDto: IPulperiaCreate) {
@@ -120,7 +122,31 @@ ORDER BY distance;
     });
   }
 
+  async checkPulperiaId(id: number) {
+    return await this.pulperiaRepository.exists({
+      where: { id },
+    });
+  }
+
   async findById(id: number) {
     return await this.pulperiaRepository.findOne({ where: { id } });
+  }
+
+  async getCategoryById(id: number, idStatus?: number) {
+    const existePulperia = await this.checkPulperiaId(id);
+    if (!existePulperia) {
+      throw new Error('Pulperia not found');
+    }
+
+    const status = await this.statusService.checkStatusId(
+      idStatus ?? STATUSENUM.ACTIVE,
+    );
+    if (!status) {
+      throw new Error('Status not found');
+    }
+
+    return (
+      await this.pulperiaCategoryService.getCategoriesByPulperia(id, idStatus)
+    ).map((el) => el.categorie);
   }
 }

@@ -17,4 +17,8 @@ export class StatusService {
   async findAll() {
     return await this.statusRepository.find();
   }
+
+  async checkStatusId(id: number) {
+    return await this.statusRepository.exists({ where: { id } });
+  }
 }

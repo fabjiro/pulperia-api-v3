@@ -14,6 +14,7 @@ import { CreatePulperiaDto } from './dto/pulperia.dto';
 import { PulperiaResDto } from './dto/pulperia.dto.res';
 import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
+// import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
 
 @Controller('pulperia')
 export class PulperiaController {
@@ -94,6 +95,18 @@ export class PulperiaController {
           status: pulperia.status,
         }),
       );
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Get('categories')
+  async getCategories(
+    @Query('pulperia') pulperia: number,
+    @Query('status') status?: number,
+  ) {
+    try {
+      return await this.pulperiaService.getCategoryById(pulperia, status);
     } catch (error) {
       throw new NotFoundException(error.toString());
     }
