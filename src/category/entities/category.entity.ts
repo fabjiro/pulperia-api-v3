@@ -10,6 +10,7 @@ import { Status } from '../../status/entities/status.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Image } from '../../image/entity/image.entity';
 import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
+import { PulperiaProduct } from '../../pulperia-product/entites/pulperia.product.entity';
 
 @Entity()
 export class Category {
@@ -25,6 +26,12 @@ export class Category {
     (pulperiaCategory) => pulperiaCategory.categorie,
   )
   pulperias: PulperiaCategory[];
+
+  @OneToMany(
+    () => PulperiaProduct,
+    (pulperiaProduct) => pulperiaProduct.category,
+  )
+  categorys: PulperiaProduct[];
 
   @ManyToOne(() => Image, (image) => image.categories)
   image: Image;
