@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { StatusService } from '../status/status.service';
 import { ImageService } from '../image/image.service';
 import {
   ICreateProduct,
+  IGetProductByName,
   IProductGet,
   IUpdateProduct,
 } from './interface/product.interface';
@@ -150,8 +151,6 @@ export class ProductService {
       }
     }
 
-    console.log(status, categoryId);
-
     return await this.productRepository.find({
       where: {
         ...(status !== null && {
@@ -162,6 +161,30 @@ export class ProductService {
         ...(categoryId !== null && {
           category: {
             id: categoryId,
+          },
+        }),
+      },
+      relations: ['status', 'image'],
+    });
+  }
+
+  async getProductsByName(query: IGetProductByName) {
+    const { name, status } = query;
+
+    if (status) {
+      const statusDb = await this.statusService.checkStatusId(status);
+
+      if (!statusDb) {
+        throw new Error('Status not found');
+      }
+    }
+
+    return await this.productRepository.find({
+      where: {
+        name: ILike(`%${name}%`),
+        ...(status !== null && {
+          status: {
+            id: status,
           },
         }),
       },

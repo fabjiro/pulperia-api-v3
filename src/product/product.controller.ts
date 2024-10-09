@@ -77,4 +77,16 @@ export class ProductController {
       throw new NotFoundException(error.toString());
     }
   }
+
+  @Get('/find')
+  async findOne(@Query('name') name: string, @Query('status') status?: number) {
+    try {
+      return await this.productService.getProductsByName({
+        name,
+        status: status ?? STATUSENUM.ACTIVE,
+      });
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 }

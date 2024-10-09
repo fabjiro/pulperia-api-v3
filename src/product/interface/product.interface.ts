@@ -16,3 +16,8 @@ export interface IProductGet {
   status?: number;
   categoryId?: number;
 }
+
+export interface IGetProductByName {
+  name: string;
+  status?: number;
+}
