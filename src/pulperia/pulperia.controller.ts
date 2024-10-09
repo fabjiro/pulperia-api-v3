@@ -61,24 +61,21 @@ export class PulperiaController {
         status,
       );
 
-      return await Promise.all(
-        reponse.map(async (pulperia) => {
-          const resultStatus = await this.statusService.findOne(
-            status ?? STATUSENUM.REVIEW,
-          );
-
-          return {
-            id: pulperia.id,
-            name: pulperia.name,
-            status: resultStatus,
-            distance: pulperia.distance,
-            coordinates: {
-              lat: pulperia.latitude,
-              lng: pulperia.longitude,
-            },
-          };
-        }),
+      const resultStatus = await this.statusService.findOne(
+        status ?? STATUSENUM.REVIEW,
       );
+
+      return reponse.map((pulperia) => ({
+        id: pulperia.id,
+        name: pulperia.name,
+        status: resultStatus,
+        distance: pulperia.distance,
+        createdById: pulperia.creatorId,
+        coordinates: {
+          lat: pulperia.latitude,
+          lng: pulperia.longitude,
+        },
+      }));
     } catch (error) {
       throw new NotFoundException(error.toString());
     }
