@@ -9,6 +9,7 @@ import { STATUSENUM } from '../status/enum/status.enum';
 import { StatusService } from '../status/status.service';
 import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
 import { PulperiaProductService } from '../pulperia-product/pulperia-product.service';
+import { UserEnum } from '../enums/user.enum';
 
 @Injectable()
 export class PulperiaService {
@@ -46,11 +47,21 @@ export class PulperiaService {
               ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
               $3
             )
-        AND "statusId" = $4
-        AND "id" = ANY($5)
+              AND (
+                "statusId" = $4
+                AND "id" = ANY($5)
+                OR "creatorId" = ANY($6)
+              )
         ORDER BY distance;
         `,
-      [lat, lng, radius, status, pulperiasId],
+      [
+        lat,
+        lng,
+        radius,
+        status,
+        pulperiasId,
+        [UserEnum.COMMUNITY, UserEnum.CREATOR],
+      ],
     );
 
     return pulperiaAviable;
