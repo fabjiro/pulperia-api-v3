@@ -6,6 +6,7 @@ import { Pulperia } from './entities/pulperia.entity';
 import { UserModule } from '../user/user.module';
 import { StatusModule } from '../status/status.module';
 import { PulperiaCategoryModule } from '../pulperia-category/pulperia-category.module';
+import { PulperiaProductModule } from '../pulperia-product/pulperia-product.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PulperiaCategoryModule } from '../pulperia-category/pulperia-category.m
     UserModule,
     StatusModule,
     PulperiaCategoryModule,
+    PulperiaProductModule,
   ],
   controllers: [PulperiaController],
   providers: [PulperiaService],

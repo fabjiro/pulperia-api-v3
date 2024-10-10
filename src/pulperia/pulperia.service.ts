@@ -8,6 +8,7 @@ import { UserService } from '../user/user.service';
 import { STATUSENUM } from '../status/enum/status.enum';
 import { StatusService } from '../status/status.service';
 import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
+import { PulperiaProductService } from '../pulperia-product/pulperia-product.service';
 
 @Injectable()
 export class PulperiaService {
@@ -17,7 +18,43 @@ export class PulperiaService {
     private readonly userService: UserService,
     private readonly statusService: StatusService,
     private readonly pulperiaCategoryService: PulperiaCategoryService,
+    private readonly pulperiaProductService: PulperiaProductService,
   ) {}
+
+  async findPulperiaByProductsAndLocation(
+    corrdinate: ICoordinates,
+    products: number[],
+    radius: number = 5,
+    status?: number,
+  ) {
+    const { lat, lng } = corrdinate;
+    const pulperiasId = (
+      await this.pulperiaProductService.getPulperiaByProductsId(products)
+    ).map((e) => e.pulperia_id);
+
+    const pulperiaAviable = await this.pulperiaRepository.query(
+      `SELECT *,
+              ST_X(coordinates::geometry) AS latitude,
+            ST_Y(coordinates::geometry) AS longitude,
+            ST_Distance(
+              coordinates::geography,
+              ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+            ) AS distance
+        FROM pulperia
+        WHERE ST_DWithin(
+              coordinates::geography,
+              ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+              $3
+            )
+        AND "statusId" = $4
+        AND "id" = ANY($5)
+        ORDER BY distance;
+        `,
+      [lat, lng, radius, status, pulperiasId],
+    );
+
+    return pulperiaAviable;
+  }
 
   async create(createPulperiaDto: IPulperiaCreate) {
     const pulperiaOnRadius = await this.findLocationsWithinRadius(

@@ -45,6 +45,7 @@ export class PulperiaController {
   }
 
   @Get('by-radius')
+  @UseGuards(JwtAuthGuard)
   async findByRadius(
     @Query('lat') lat: number,
     @Query('lng') lng: number,
@@ -60,6 +61,47 @@ export class PulperiaController {
         radius,
         status,
       );
+
+      const resultStatus = await this.statusService.findOne(
+        status ?? STATUSENUM.REVIEW,
+      );
+
+      return reponse.map((pulperia) => ({
+        id: pulperia.id,
+        name: pulperia.name,
+        status: resultStatus,
+        distance: pulperia.distance,
+        createdById: pulperia.creatorId,
+        coordinates: {
+          lat: pulperia.latitude,
+          lng: pulperia.longitude,
+        },
+      }));
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Get('by-product')
+  @UseGuards(JwtAuthGuard)
+  async findByProduct(
+    @Query('lat') lat: number,
+    @Query('lng') lng: number,
+    @Query('productId') productIds: number[],
+    @Query('radius') radius?: number,
+    @Query('status') status?: number,
+  ) {
+    try {
+      const reponse =
+        await this.pulperiaService.findPulperiaByProductsAndLocation(
+          {
+            lat,
+            lng,
+          },
+          productIds,
+          radius,
+          status,
+        );
 
       const resultStatus = await this.statusService.findOne(
         status ?? STATUSENUM.REVIEW,
