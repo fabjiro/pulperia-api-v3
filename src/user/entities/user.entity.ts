@@ -9,6 +9,7 @@ import { IsNotEmpty, IsEmail } from 'class-validator';
 import { Rol } from '../../rol/entity/rol.entity';
 import { Image } from '../../image/entity/image.entity';
 import { Pulperia } from '../../pulperia/entities/pulperia.entity';
+import { PulperiaComunnity } from '../../pulperia-community/entity/pulperia.community.entity';
 
 @Entity()
 export class User {
@@ -27,6 +28,12 @@ export class User {
   @Column()
   @IsNotEmpty()
   password: string;
+
+  @OneToMany(
+    () => PulperiaComunnity,
+    (pulperiaCommunity) => pulperiaCommunity.user,
+  )
+  pulperias: PulperiaComunnity[];
 
   @ManyToOne(() => Rol, (role) => role.users)
   rol: Rol;

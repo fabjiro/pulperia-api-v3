@@ -11,6 +11,7 @@ import { ProductModule } from './product/product.module';
 import { PulperiaModule } from './pulperia/pulperia.module';
 import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.module';
 import { PulperiaProductModule } from './pulperia-product/pulperia-product.module';
+import { PulperiaCommunityModule } from './pulperia-community/pulperia-community.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PulperiaProductModule } from './pulperia-product/pulperia-product.modul
     PulperiaModule,
     PulperiaCategoryModule,
     PulperiaProductModule,
+    PulperiaCommunityModule,
   ],
 })
 export class AppModule {}

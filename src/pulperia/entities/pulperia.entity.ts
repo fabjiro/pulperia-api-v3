@@ -13,6 +13,7 @@ import { User } from '../../user/entities/user.entity';
 import { Status } from '../../status/entities/status.entity';
 import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../../pulperia-product/entites/pulperia.product.entity';
+import { PulperiaComunnity } from '../../pulperia-community/entity/pulperia.community.entity';
 
 @Entity()
 export class Pulperia {
@@ -45,6 +46,12 @@ export class Pulperia {
     (pulperiaProduct) => pulperiaProduct.pulperia,
   )
   products: PulperiaProduct[];
+
+  @OneToMany(
+    () => PulperiaComunnity,
+    (pulperiaCommunnity) => pulperiaCommunnity.pulperia,
+  )
+  users: PulperiaComunnity[];
 
   @Column({
     type: 'geometry',
