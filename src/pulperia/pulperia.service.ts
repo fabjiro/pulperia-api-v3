@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Pulperia } from './entities/pulperia.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IPulperiaCreate } from './interface/pulperia.interface';
+import {
+  IPulperiaCreate,
+  IPulperiaUpdate,
+} from './interface/pulperia.interface';
 import { ICoordinates } from './interface/coordinates.interface';
 import { UserService } from '../user/user.service';
 import { STATUSENUM } from '../status/enum/status.enum';
@@ -111,6 +114,56 @@ export class PulperiaService {
     });
 
     return await this.pulperiaRepository.save(createdPulperia);
+  }
+
+  async update(updatePulperiaDto: IPulperiaUpdate, id: number) {
+    const pulperia = await this.findById(id);
+    const { statusId, creatorId, name, ownerId } = updatePulperiaDto;
+    if (!pulperia) {
+      throw new Error('Pulperia not found');
+    }
+
+    if (statusId) {
+      const status = await this.statusService.findOne(
+        updatePulperiaDto.statusId ?? STATUSENUM.REVIEW,
+      );
+      if (!status) {
+        throw new Error('Status not found');
+      }
+    }
+
+    if (ownerId) {
+      const owner = await this.userService.findBydId(ownerId);
+      if (!owner) {
+        throw new Error('Owner not found');
+      }
+    }
+
+    if (creatorId) {
+      const creator = await this.userService.findBydId(creatorId);
+      if (!creator) {
+        throw new Error('Creator not found');
+      }
+    }
+
+    await this.pulperiaRepository.update(id, {
+      ...(statusId && {
+        status: {
+          id: statusId,
+        },
+      }),
+      ...(ownerId && {
+        owner: {
+          id: ownerId,
+        },
+      }),
+      ...(creatorId && {
+        creator: {
+          id: creatorId,
+        },
+      }),
+      ...(name && { name }),
+    });
   }
 
   async findLocationsWithinRadius(

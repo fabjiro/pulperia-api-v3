@@ -10,10 +10,16 @@ import {
 } from '@nestjs/common';
 import { PulperiaService } from './pulperia.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
-import { CreatePulperiaDto } from './dto/pulperia.dto';
+import {
+  CreateCommunityPulperiaDto,
+  CreatePulperiaDto,
+} from './dto/pulperia.dto';
 import { PulperiaResDto } from './dto/pulperia.dto.res';
 import { StatusService } from '../status/status.service';
 import { STATUSENUM } from '../status/enum/status.enum';
+import { UserService } from '../user/user.service';
+import { UserEnum } from '../enums/user.enum';
+import { PulperiaCommunityService } from '../pulperia-community/pulperia-community.service';
 // import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
 
 @Controller('pulperia')
@@ -21,6 +27,8 @@ export class PulperiaController {
   constructor(
     private readonly pulperiaService: PulperiaService,
     private readonly statusService: StatusService,
+    private readonly userService: UserService,
+    private readonly pulperiaCommunityService: PulperiaCommunityService,
   ) {}
 
   @Post()
@@ -146,6 +154,98 @@ export class PulperiaController {
   ) {
     try {
       return await this.pulperiaService.getCategoryById(pulperia, status);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+  @Post('community')
+  @UseGuards(JwtAuthGuard)
+  async community(
+    @Request() req,
+    @Body() createPulperia: CreateCommunityPulperiaDto,
+  ) {
+    try {
+      const userId = req.user.id;
+      const { coordinates } = createPulperia;
+
+      if (!userId) {
+        throw new NotFoundException('User id required');
+      }
+
+      const user = this.userService.findBydId(userId);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const pulperiasByRadius =
+        (await this.pulperiaService.findLocationsWithinRadius(
+          {
+            lat: coordinates[0],
+            lng: coordinates[1],
+          },
+          0.5,
+        )) as any[];
+
+      if (pulperiasByRadius.length === 0) {
+        const randomNumber = Math.floor(Math.random() * 1000);
+
+        const newPulperia = await this.pulperiaService.create({
+          coordinates: {
+            lat: coordinates[0],
+            lng: coordinates[1],
+          },
+          name: `Pulperia_p${randomNumber}`,
+          creatorId: UserEnum.COMMUNITY,
+          ownerId: UserEnum.COMMUNITY,
+        });
+
+        await this.pulperiaCommunityService.insertPulperiaCommunity(
+          newPulperia.id,
+          userId,
+        );
+
+        return newPulperia;
+      }
+
+      const pulperia = pulperiasByRadius[0];
+
+      if ((pulperia.statusId as number) === STATUSENUM.ACTIVE) {
+        throw new NotFoundException(
+          'This pulperia is already active, please try another one',
+        );
+      }
+
+      const check =
+        await this.pulperiaCommunityService.checkExistUserPulperiacommunity(
+          pulperia.id,
+          userId,
+        );
+      if (check) {
+        throw new NotFoundException(
+          'You are already in this pulperia community',
+        );
+      }
+
+      await this.pulperiaCommunityService.insertPulperiaCommunity(
+        pulperia.id,
+        userId,
+      );
+
+      const count = await this.pulperiaCommunityService.getCountByPulperia(
+        pulperia.id,
+      );
+
+      if (count >= 3) {
+        await this.pulperiaService.update(
+          {
+            statusId: STATUSENUM.ACTIVE,
+          },
+          pulperia.id,
+        );
+      }
+
+      return pulperia;
     } catch (error) {
       throw new NotFoundException(error.toString());
     }

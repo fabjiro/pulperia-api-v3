@@ -8,3 +8,10 @@ export interface IPulperiaCreate {
   creatorId?: number;
   coordinates: ICoordinates;
 }
+
+export interface IPulperiaUpdate {
+  name?: string;
+  statusId?: number;
+  ownerId?: number;
+  creatorId?: number;
+}

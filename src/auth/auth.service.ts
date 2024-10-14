@@ -6,6 +6,7 @@ import { EncryptionService } from '../utils/encrypt.utils';
 import { AuthLoginReqDto } from './dto/auth.req.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ImageService } from '../image/image.service';
+import { IMAGEENUM } from '../image/enum/image.enum';
 
 @Injectable()
 export class AuthService {
@@ -27,13 +28,13 @@ export class AuthService {
       userData.password,
     );
 
-    const avatar = await this.imageService.create(userData.avatar);
-    const avatarLocal = await this.imageService.findById(avatar.id ?? 0);
+    // const avatar = await this.imageService.create(userData.avatar);
+    const avatarLocal = await this.imageService.findById(IMAGEENUM.DEFAULTUSER);
 
     const newUser = await this.userService.add({
       email: userData.email,
       name: userData.name,
-      avatar: avatar.id,
+      avatar: IMAGEENUM.DEFAULTUSER,
       password: hashedPassword,
     });
 

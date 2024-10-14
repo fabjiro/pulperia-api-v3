@@ -1,5 +1,4 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Product } from '../../product/entities/product.entity';
 import { Pulperia } from '../../pulperia/entities/pulperia.entity';
 import { User } from '../../user/entities/user.entity';
 
@@ -15,7 +14,7 @@ export class PulperiaComunnity {
   @JoinColumn({ name: 'pulperia_id' })
   pulperia: Pulperia;
 
-  @ManyToOne(() => Product, (product) => product.pulperias)
+  @ManyToOne(() => User, (user) => user.pulperias)
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

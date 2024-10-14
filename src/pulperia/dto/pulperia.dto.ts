@@ -18,3 +18,10 @@ export class CreatePulperiaDto {
   @IsNumber({}, { each: true, message: 'coordinates deben ser numericas' })
   coordinates: [number, number]; // [longitude, latitude]
 }
+
+export class CreateCommunityPulperiaDto {
+  @IsArray({ message: 'coordinates deben ser arreglos' })
+  @IsNotEmpty({ message: 'coordinates son requeridas' })
+  @IsNumber({}, { each: true, message: 'coordinates deben ser numericas' })
+  coordinates: [number, number]; // [longitude, latitude]
+}
