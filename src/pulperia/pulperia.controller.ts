@@ -158,6 +158,35 @@ export class PulperiaController {
       throw new NotFoundException(error.toString());
     }
   }
+
+  @Get('community/me')
+  @UseGuards(JwtAuthGuard)
+  async myCommunity(@Request() req) {
+    try {
+      const userId = req.user.id;
+      if (!userId) {
+        throw new NotFoundException('User id required');
+      }
+
+      const user = await this.userService.findBydId(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const myCommunity = await this.pulperiaCommunityService.getByUserId(
+        user.id,
+      );
+
+      return myCommunity.map((e) => ({
+        id: e.pulperia.id,
+        name: e.pulperia.name,
+        status: e.pulperia.status,
+      }));
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
   @Post('community')
   @UseGuards(JwtAuthGuard)
   async community(

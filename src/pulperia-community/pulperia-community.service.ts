@@ -37,4 +37,12 @@ export class PulperiaCommunityService {
     });
     return !!pulperiacommunity;
   }
+
+  async getByUserId(idUser: number) {
+    return await this.pulperiacommunityRepository.find({
+      where: { user_id: idUser },
+      select: ['pulperia_id'],
+      relations: ['pulperia', 'pulperia.status'],
+    });
+  }
 }
