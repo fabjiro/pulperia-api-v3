@@ -17,4 +17,12 @@ export class PulperiaProductService {
       .where('pulperiaProduct.product_id IN (:...idProducts)', { idProducts })
       .getRawMany();
   }
+
+  async addPulperiaProduct(idPulperia: number, idProduct: number) {
+    const newPulperiaProduct = this.pulperiaProductRepository.create({
+      pulperia_id: idPulperia,
+      product_id: idProduct,
+    });
+    return await this.pulperiaProductRepository.save(newPulperiaProduct);
+  }
 }

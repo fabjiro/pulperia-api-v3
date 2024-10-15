@@ -42,6 +42,7 @@ export class PulperiaController {
         statusId: createPulperia.status,
         ownerId: createPulperia.owner ?? currentUser,
         creatorId: createPulperia.creator ?? currentUser,
+        inventory: createPulperia.inventory,
         coordinates: {
           lat: createPulperia.coordinates[0],
           lng: createPulperia.coordinates[1],

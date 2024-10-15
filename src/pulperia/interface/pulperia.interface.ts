@@ -7,6 +7,12 @@ export interface IPulperiaCreate {
   ownerId?: number;
   creatorId?: number;
   coordinates: ICoordinates;
+  inventory?: IIventoryPulperia[];
+}
+
+export interface IIventoryPulperia {
+  categoryId: number;
+  products: number[];
 }
 
 export interface IPulperiaUpdate {

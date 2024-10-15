@@ -113,7 +113,38 @@ export class PulperiaService {
       creator,
     });
 
-    return await this.pulperiaRepository.save(createdPulperia);
+    const newPulperia = await this.pulperiaRepository.save(createdPulperia);
+
+    if (createPulperiaDto.inventory) {
+      const categoriesToAdd = createPulperiaDto.inventory.map(
+        (item) => item.categoryId,
+      );
+
+      await Promise.all(
+        categoriesToAdd.map((categoryId) => {
+          return this.pulperiaCategoryService.addCategoryToPulperia(
+            newPulperia.id,
+            categoryId,
+          );
+        }),
+      );
+
+      for (const item of createPulperiaDto.inventory) {
+        await Promise.all(
+          item.products.map((productId) => {
+            return this.pulperiaProductService.addPulperiaProduct(
+              newPulperia.id,
+              productId,
+            );
+          }),
+        );
+      }
+    }
+    const { id, name } = newPulperia;
+    return {
+      id,
+      name,
+    };
   }
 
   async update(updatePulperiaDto: IPulperiaUpdate, id: number) {
