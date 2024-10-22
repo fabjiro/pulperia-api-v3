@@ -12,6 +12,7 @@ import { PulperiaModule } from './pulperia/pulperia.module';
 import { PulperiaCategoryModule } from './pulperia-category/pulperia-category.module';
 import { PulperiaProductModule } from './pulperia-product/pulperia-product.module';
 import { PulperiaCommunityModule } from './pulperia-community/pulperia-community.module';
+import { UserInvitationModule } from './user-invitation/user-invitation.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { PulperiaCommunityModule } from './pulperia-community/pulperia-community
     PulperiaCategoryModule,
     PulperiaProductModule,
     PulperiaCommunityModule,
+    UserInvitationModule,
   ],
 })
 export class AppModule {}
