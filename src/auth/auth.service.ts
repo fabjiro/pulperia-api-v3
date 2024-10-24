@@ -122,6 +122,7 @@ export class AuthService {
         original_link: user.avatar?.original_link ?? '',
         min_link: user.avatar?.min_link ?? '',
       },
+      rol: user.rol,
     };
   }
 
