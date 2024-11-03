@@ -195,6 +195,7 @@ export class ProductService {
   async findAll() {
     return await this.productRepository.find({
       relations: ['status', 'image', 'category'],
+      order: { id: 'ASC' },
     });
   }
 
@@ -202,6 +203,7 @@ export class ProductService {
     return await this.productRepository.findOne({
       where: { id },
       relations: relation ? ['status', 'image', 'category'] : [],
+      order: { id: 'DESC' },
     });
   }
 }
