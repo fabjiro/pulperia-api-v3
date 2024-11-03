@@ -100,10 +100,12 @@ export class CategoryService {
       return await this.categoryRepository.find({
         where: { status: statusDb },
         relations: ['status', 'image'],
+        order: { id: 'DESC' },
       });
     }
     return await this.categoryRepository.find({
       relations: ['status', 'image'],
+      order: { id: 'DESC' },
     });
   }
 
