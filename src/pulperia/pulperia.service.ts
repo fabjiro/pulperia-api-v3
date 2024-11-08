@@ -27,8 +27,43 @@ export class PulperiaService {
 
   async all() {
     return await this.pulperiaRepository.find({
-      select: ['id', 'name', 'createdAt', 'updatedAt'],
-      relations: ['status'],
+      select: {
+        id: true,
+        name: true,
+        coordinates: true,
+        createdAt: true,
+        updatedAt: true,
+        status: {
+          id: true,
+          name: true,
+        },
+        owner: {
+          id: true,
+          name: true,
+          avatar: {
+            min_link: true,
+            original_link: true,
+          },
+        },
+        creator: {
+          id: true,
+          name: true,
+          avatar: {
+            min_link: true,
+            original_link: true,
+          },
+        },
+      },
+      relations: {
+        status: true,
+        owner: {
+          avatar: true,
+        },
+        creator: {
+          avatar: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
     });
   }
 
