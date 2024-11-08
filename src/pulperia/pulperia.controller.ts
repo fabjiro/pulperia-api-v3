@@ -20,6 +20,9 @@ import { STATUSENUM } from '../status/enum/status.enum';
 import { UserService } from '../user/user.service';
 import { UserEnum } from '../enums/user.enum';
 import { PulperiaCommunityService } from '../pulperia-community/pulperia-community.service';
+import { Roles } from '../rol/decorators/rols.decorator';
+import { RolEnum } from '../rol/enum/RolEnum';
+import { RolesGuard } from '../rol/guards/role.guard';
 // import { PulperiaCategoryService } from '../pulperia-category/pulperia-category.service';
 
 @Controller('pulperia')
@@ -30,6 +33,17 @@ export class PulperiaController {
     private readonly userService: UserService,
     private readonly pulperiaCommunityService: PulperiaCommunityService,
   ) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard) // Usa los guards en cadena
+  @Roles(RolEnum.ADMIN) // Este decorador asigna el rol
+  async findAll() {
+    try {
+      return await this.pulperiaService.all();
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)

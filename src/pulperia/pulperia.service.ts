@@ -25,6 +25,13 @@ export class PulperiaService {
     private readonly pulperiaProductService: PulperiaProductService,
   ) {}
 
+  async all() {
+    return await this.pulperiaRepository.find({
+      select: ['id', 'name', 'createdAt', 'updatedAt'],
+      relations: ['status'],
+    });
+  }
+
   async findPulperiaByProductsAndLocation(
     corrdinate: ICoordinates,
     products: number[],
