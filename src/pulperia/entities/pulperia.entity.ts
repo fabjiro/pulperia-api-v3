@@ -32,6 +32,10 @@ export class Pulperia {
   @IsNotEmpty()
   creator: User;
 
+  @ManyToOne(() => User, (user) => user.pulperiasAsReviewer)
+  @IsNotEmpty()
+  reviwer?: User;
+
   @ManyToOne(() => Status, (status) => status.pulperias)
   status: Status;
 

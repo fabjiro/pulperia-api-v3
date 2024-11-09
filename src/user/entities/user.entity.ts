@@ -46,4 +46,7 @@ export class User {
 
   @OneToMany(() => Pulperia, (pulperia) => pulperia.creator)
   pulperiasAsCreator: Pulperia[];
+
+  @OneToMany(() => Pulperia, (pulperia) => pulperia.reviwer)
+  pulperiasAsReviewer: Pulperia[];
 }

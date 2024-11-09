@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Get,
   Query,
+  Param,
 } from '@nestjs/common';
 import { PulperiaService } from './pulperia.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
@@ -33,6 +34,17 @@ export class PulperiaController {
     private readonly userService: UserService,
     private readonly pulperiaCommunityService: PulperiaCommunityService,
   ) {}
+
+  @Post('reviewer/:id')
+  @UseGuards(JwtAuthGuard)
+  async setReviewer(@Param('id') id: number, @Request() req) {
+    try {
+      const userId = req.user.id;
+      return await this.pulperiaService.setReviewer(id, userId);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard) // Usa los guards en cadena

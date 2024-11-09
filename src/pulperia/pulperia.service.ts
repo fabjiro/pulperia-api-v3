@@ -323,4 +323,41 @@ ORDER BY distance;
       await this.pulperiaCategoryService.getCategoriesByPulperia(id, idStatus)
     ).map((el) => el.categorie);
   }
+
+  async setReviewer(idPulperia: number, idUser: number) {
+    const pulperia = await this.pulperiaRepository.findOne({
+      where: { id: idPulperia },
+      relations: ['reviwer', 'status'],
+    });
+
+    console.log(pulperia);
+    const user = await this.userService.findBydId(idUser);
+
+    if (!pulperia) {
+      throw new Error('Pulperia not found');
+    }
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (pulperia.reviwer) {
+      return await this.findById(idPulperia);
+    }
+
+    if (pulperia.status.id === STATUSENUM.REVIEW) {
+      return await this.findById(idPulperia);
+    }
+
+    await this.pulperiaRepository.update(idPulperia, {
+      reviwer: {
+        id: idUser,
+      },
+      status: {
+        id: STATUSENUM.REVIEW,
+      },
+    });
+
+    return await this.findById(idPulperia);
+  }
 }
