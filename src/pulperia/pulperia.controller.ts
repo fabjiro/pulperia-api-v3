@@ -35,6 +35,17 @@ export class PulperiaController {
     private readonly pulperiaCommunityService: PulperiaCommunityService,
   ) {}
 
+  @Get('reviewes')
+  @UseGuards(JwtAuthGuard)
+  async findReviewes(@Request() req) {
+    try {
+      const userId = req.user.id;
+      return await this.pulperiaService.getMyReview(userId);
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
   @Post('reviewer/:id')
   @UseGuards(JwtAuthGuard)
   async setReviewer(@Param('id') id: number, @Request() req) {

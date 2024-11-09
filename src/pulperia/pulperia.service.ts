@@ -30,22 +30,13 @@ export class PulperiaService {
       select: {
         id: true,
         name: true,
-        coordinates: true,
         createdAt: true,
         updatedAt: true,
         status: {
           id: true,
           name: true,
         },
-        owner: {
-          id: true,
-          name: true,
-          avatar: {
-            min_link: true,
-            original_link: true,
-          },
-        },
-        creator: {
+        reviwer: {
           id: true,
           name: true,
           avatar: {
@@ -56,10 +47,7 @@ export class PulperiaService {
       },
       relations: {
         status: true,
-        owner: {
-          avatar: true,
-        },
-        creator: {
+        reviwer: {
           avatar: true,
         },
       },
@@ -330,7 +318,6 @@ ORDER BY distance;
       relations: ['reviwer', 'status'],
     });
 
-    console.log(pulperia);
     const user = await this.userService.findBydId(idUser);
 
     if (!pulperia) {
@@ -359,5 +346,53 @@ ORDER BY distance;
     });
 
     return await this.findById(idPulperia);
+  }
+
+  async getMyReview(idUser: number) {
+    const user = await this.userService.findBydId(idUser);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return await this.pulperiaRepository.find({
+      where: { reviwer: { id: idUser } },
+      select: {
+        id: true,
+        name: true,
+        coordinates: true,
+        createdAt: true,
+        updatedAt: true,
+        status: {
+          id: true,
+          name: true,
+        },
+        owner: {
+          id: true,
+          name: true,
+          avatar: {
+            min_link: true,
+            original_link: true,
+          },
+        },
+        creator: {
+          id: true,
+          name: true,
+          avatar: {
+            min_link: true,
+            original_link: true,
+          },
+        },
+      },
+      relations: {
+        status: true,
+        owner: {
+          avatar: true,
+        },
+        creator: {
+          avatar: true,
+        },
+      },
+    });
   }
 }
