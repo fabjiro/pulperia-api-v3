@@ -135,7 +135,7 @@ export class PulperiaService {
     }
 
     const status = await this.statusService.findOne(
-      createPulperiaDto.statusId ?? STATUSENUM.REVIEW,
+      createPulperiaDto.statusId ?? STATUSENUM.PENDING,
     );
     if (!status) {
       throw new Error('Status not found');
