@@ -1,37 +1,34 @@
-# Etapa 1: Construcción con Node.js y pnpm
-FROM node:20-alpine AS builder
+# Etapa de construcción
+FROM oven/bun:canary-alpine AS builder
 
 # Configuración del entorno de trabajo
 WORKDIR /app
 
-# Copia los archivos necesarios para instalar las dependencias
-COPY package.json pnpm-lock.yaml ./
+# Copia solo los archivos necesarios para instalar las dependencias
+COPY package.json ./
 
-# Instala pnpm globalmente y las dependencias del proyecto
-RUN npm install -g pnpm@8.15.8 && pnpm install --frozen-lockfile
+# Instala todas las dependencias del proyecto (incluyendo devDependencies)
+RUN bun install
 
 # Copia el resto del código fuente
 COPY . .
 
-# Compila el proyecto
-RUN pnpm build
+# Compila el proyecto usando el comando definido en package.json
+RUN bun run build
 
-# Etapa 2: Imagen final para producción con Bun
-FROM oven/bun AS runner
+# Etapa final: imagen de producción
+FROM oven/bun:canary-alpine AS runner
 
 # Configuración del entorno de trabajo
 WORKDIR /app
 
-# Copia los archivos necesarios desde la etapa de construcción
+# Copia solo los archivos necesarios desde la etapa de construcción
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-
-# Instala solo las dependencias de producción con Bun
-RUN bun install --production
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules 
 
 # Expone el puerto de la aplicación
 EXPOSE 3000
-
 
 # Ejecuta la aplicación con Bun
 CMD ["bun", "dist/main.js"]
