@@ -1,28 +1,37 @@
-# Usa la imagen de Node.js v20.13.1 basada en Alpine
-FROM node:20.13.1-alpine
+# Etapa 1: Construcción con Node.js y pnpm
+FROM node:20-alpine AS builder
 
-# Instala pnpm globalmente
-RUN npm install -g pnpm
-
-# Establece el directorio de trabajo
+# Configuración del entorno de trabajo
 WORKDIR /app
 
-# Copia los archivos de pnpm-lock.yml y package.json
-COPY pnpm-lock.yaml ./
-COPY package.json ./
+# Copia los archivos necesarios para instalar las dependencias
+COPY package.json pnpm-lock.yaml ./
 
-# Instala las dependencias del proyecto usando pnpm
-RUN pnpm install
+# Instala pnpm globalmente y las dependencias del proyecto
+RUN npm install -g pnpm@8.15.8 && pnpm install --frozen-lockfile
 
-# Copia el resto del código de la aplicación
+# Copia el resto del código fuente
 COPY . .
 
-# Construye la aplicación
+# Compila el proyecto
 RUN pnpm build
 
-# Expone el puerto 3000
+# Etapa 2: Imagen final para producción con Bun
+FROM oven/bun AS runner
+
+# Configuración del entorno de trabajo
+WORKDIR /app
+
+# Copia los archivos necesarios desde la etapa de construcción
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
+
+# Instala solo las dependencias de producción con Bun
+RUN bun install --production
+
+# Expone el puerto de la aplicación
 EXPOSE 3000
 
-# Comando para ejecutar la aplicación en producción
-CMD ["sh", "-c", "pnpm build && pnpm start:prod"]
 
+# Ejecuta la aplicación con Bun
+CMD ["bun", "dist/main.js"]
