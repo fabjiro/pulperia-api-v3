@@ -317,4 +317,18 @@ export class PulperiaController {
       throw new NotFoundException(error.toString());
     }
   }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getPulperiaById(
+    // @Param('id') id: number,
+    @Param('id') id: number,
+  ): Promise<PulperiaResDto> {
+    try {
+      const pulperia = await this.pulperiaService.findById(id);
+      return pulperia;
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
 }

@@ -5,3 +5,5 @@ export interface PulperiaResDto {
   name: string;
   status: StatusResDto;
 }
+
+// export interface PulperiaDetailResDto extends PulperiaResDto {}
