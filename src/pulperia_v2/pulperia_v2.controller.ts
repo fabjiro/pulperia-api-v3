@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { PulperiaV2Service } from './pulperia_v2.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
+import { plainToInstance } from 'class-transformer';
+import { UserResDto } from './dto/pulperia.res.dto';
 
 @Controller('pulperia_v2')
 export class PulperiaV2Controller {
@@ -17,7 +19,13 @@ export class PulperiaV2Controller {
   @UseGuards(JwtAuthGuard)
   async findById(@Param('id') id: number) {
     try {
-      return await this.pulperiaV2Service.getPulperiaById(id);
+      const data = await this.pulperiaV2Service.getPulperiaById(id);
+
+      return {
+        ...data,
+        owner: plainToInstance(UserResDto, data.owner),
+        creator: plainToInstance(UserResDto, data.creator),
+      };
     } catch (error) {
       throw new NotFoundException(error.toString());
     }

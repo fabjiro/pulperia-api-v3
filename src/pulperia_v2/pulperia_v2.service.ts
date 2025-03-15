@@ -21,7 +21,18 @@ export class PulperiaV2Service {
   ) {}
 
   async getPulperiaById(id: number) {
-    return await this.pulperiaRepository.findOneBy({ id });
+    return await this.pulperiaRepository.findOne({
+      where: {
+        id,
+      },
+      relations: [
+        'status',
+        'owner',
+        'owner.avatar',
+        'creator',
+        'creator.avatar',
+      ],
+    });
   }
 
   async getCategoryByPulperiaId(pulperiaId: number, status?: number) {
