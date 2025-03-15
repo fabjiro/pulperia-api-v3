@@ -3,16 +3,18 @@ import { PulperiaV2Service } from './pulperia_v2.service';
 import { PulperiaV2Controller } from './pulperia_v2.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pulperia } from '../pulperia/entities/pulperia.entity';
-import { StatusModule } from '../status/status.module';
-import { UserModule } from '../user/user.module';
 import { PulperiaCategory } from '../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../pulperia-product/entites/pulperia.product.entity';
+import { Status } from '../status/entities/status.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Pulperia, PulperiaCategory, PulperiaProduct]),
-    UserModule,
-    StatusModule,
+    TypeOrmModule.forFeature([
+      Pulperia,
+      PulperiaCategory,
+      PulperiaProduct,
+      Status,
+    ]),
 
     // PulperiaCategoryModule,
     // PulperiaProductModule,

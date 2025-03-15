@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pulperia } from '../pulperia/entities/pulperia.entity';
 import { StatusService } from '../status/status.service';
-import { UserService } from '../user/user.service';
 import { PulperiaCategory } from '../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../pulperia-product/entites/pulperia.product.entity';
+import { Status } from '../status/entities/status.entity';
 
 @Injectable()
 export class PulperiaV2Service {
@@ -16,7 +16,8 @@ export class PulperiaV2Service {
     private readonly pulperiaCategoryRepository: Repository<PulperiaCategory>,
     @InjectRepository(PulperiaProduct)
     private readonly pulperiaProductRepository: Repository<PulperiaProduct>,
-    private readonly userService: UserService,
+    @InjectRepository(Status)
+    private readonly statusRepository: Repository<Status>,
     private readonly statusService: StatusService,
   ) {}
 
@@ -77,5 +78,35 @@ export class PulperiaV2Service {
     });
 
     return products.map((e) => e.product);
+  }
+
+  async updatePulperia(id: number, name?: string, status?: number) {
+    const pulperia = await this.pulperiaRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!pulperia) {
+      throw new Error('Pulperia not found');
+    }
+
+    if (name) {
+      pulperia.name = name;
+    }
+
+    if (status) {
+      const statusRes = await this.statusService.findOne(status);
+
+      if (!statusRes) {
+        throw new Error('Status not found');
+      }
+
+      pulperia.status = statusRes;
+    }
+
+    pulperia.updatedAt = new Date();
+
+    return await this.pulperiaRepository.save(pulperia);
   }
 }
