@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pulperia } from '../pulperia/entities/pulperia.entity';
-import { StatusService } from '../status/status.service';
 import { PulperiaCategory } from '../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../pulperia-product/entites/pulperia.product.entity';
 import { Status } from '../status/entities/status.entity';
@@ -18,7 +17,6 @@ export class PulperiaV2Service {
     private readonly pulperiaProductRepository: Repository<PulperiaProduct>,
     @InjectRepository(Status)
     private readonly statusRepository: Repository<Status>,
-    private readonly statusService: StatusService,
   ) {}
 
   async getPulperiaById(id: number) {
@@ -96,7 +94,9 @@ export class PulperiaV2Service {
     }
 
     if (status) {
-      const statusRes = await this.statusService.findOne(status);
+      const statusRes = await this.statusRepository.findOneBy({
+        id: status,
+      });
 
       if (!statusRes) {
         throw new Error('Status not found');
