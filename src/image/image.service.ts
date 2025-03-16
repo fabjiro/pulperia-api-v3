@@ -6,6 +6,10 @@ import { ImagePostRes } from './dto/image.dto';
 import * as sharp from 'sharp';
 import axios, { AxiosInstance } from 'axios';
 import { IMAGEENUM } from './enum/image.enum';
+import * as fs from 'fs';
+import * as os from 'os';
+import { join } from 'path';
+import * as FormData from 'form-data';
 
 const uuidRegex =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
@@ -45,10 +49,14 @@ export class ImageService {
       return;
     }
 
-    await Promise.all([
-      this.deleteImagePost(image.original_link),
-      this.deleteImagePost(image.min_link),
-    ]);
+    if (image.original_link === image.min_link) {
+      await this.deleteImagePost(image.original_link);
+    } else {
+      await Promise.all([
+        this.deleteImagePost(image.original_link),
+        this.deleteImagePost(image.min_link),
+      ]);
+    }
 
     return await this.imageRepository.remove(image);
   }
@@ -143,15 +151,20 @@ export class ImageService {
   }
 
   async uploadFile(file: Express.Multer.File): Promise<Image | null> {
-    console.log(file);
-    console.log(file.mimetype);
-    // Convertir el archivo a un Blob
-    const blob = new Blob([file.buffer], { type: file.mimetype });
+    const tempDir = os.tmpdir();
 
-    // form data
+    // Crear la ruta del archivo temporal
+    const tempFilePath = join(tempDir, file.originalname);
+
+    fs.writeFileSync(tempFilePath, file.buffer);
+
+    // Crear un nuevo FormData
     const formData = new FormData();
-    formData.append('file', blob);
 
+    formData.append('file', fs.createReadStream(tempFilePath), {
+      filename: file.originalname,
+      contentType: file.mimetype,
+    });
     const { data } = await this.axiosInstance.post<ImagePostRes>(
       '/file/form',
       formData,
@@ -161,6 +174,9 @@ export class ImageService {
         },
       },
     );
+
+    // Eliminar el archivo temporal
+    fs.unlinkSync(tempFilePath);
 
     return await this.imageRepository.save({
       original_link: data.link,
