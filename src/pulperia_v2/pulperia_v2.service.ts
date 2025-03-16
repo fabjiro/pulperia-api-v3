@@ -30,6 +30,7 @@ export class PulperiaV2Service {
         'owner.avatar',
         'creator',
         'creator.avatar',
+        'avatar',
       ],
     });
   }
