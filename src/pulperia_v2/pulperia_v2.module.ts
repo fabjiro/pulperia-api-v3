@@ -6,6 +6,7 @@ import { Pulperia } from '../pulperia/entities/pulperia.entity';
 import { PulperiaCategory } from '../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../pulperia-product/entites/pulperia.product.entity';
 import { Status } from '../status/entities/status.entity';
+import { ImageModule } from '../image/image.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { Status } from '../status/entities/status.entity';
       PulperiaProduct,
       Status,
     ]),
-
+    ImageModule,
     // PulperiaCategoryModule,
     // PulperiaProductModule,
     // PulperiaCommunityModule,

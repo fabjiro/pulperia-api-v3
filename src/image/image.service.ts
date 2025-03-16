@@ -141,4 +141,21 @@ export class ImageService {
   async deleteImagePost(link: string) {
     await this.axiosInstance.delete(`/file/${link.match(uuidRegex)[0]}`);
   }
+
+  async uploadFile(file: Express.Multer.File): Promise<ImagePostRes> {
+    // Convertir el archivo a un Blob
+    const blob = new Blob([file.buffer], { type: file.mimetype });
+
+    // form data
+    const formData = new FormData();
+    formData.append('file', blob);
+
+    const { data } = await this.axiosInstance.post('/file/form', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return data as ImagePostRes;
+  }
 }

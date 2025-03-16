@@ -5,6 +5,8 @@ import { Pulperia } from '../pulperia/entities/pulperia.entity';
 import { PulperiaCategory } from '../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../pulperia-product/entites/pulperia.product.entity';
 import { Status } from '../status/entities/status.entity';
+import { ImageService } from '../image/image.service';
+import { IMAGECONST } from '../image/const/image.const';
 
 @Injectable()
 export class PulperiaV2Service {
@@ -17,6 +19,7 @@ export class PulperiaV2Service {
     private readonly pulperiaProductRepository: Repository<PulperiaProduct>,
     @InjectRepository(Status)
     private readonly statusRepository: Repository<Status>,
+    private readonly imageService: ImageService,
   ) {}
 
   async getPulperiaById(id: number) {
@@ -79,7 +82,12 @@ export class PulperiaV2Service {
     return products.map((e) => e.product);
   }
 
-  async updatePulperia(id: number, name?: string, status?: number) {
+  async updatePulperia(
+    id: number,
+    name?: string,
+    status?: number,
+    file?: Express.Multer.File,
+  ) {
     const pulperia = await this.pulperiaRepository.findOne({
       where: {
         id,
@@ -90,10 +98,12 @@ export class PulperiaV2Service {
       throw new Error('Pulperia not found');
     }
 
+    // update name
     if (name) {
       pulperia.name = name;
     }
 
+    // update status
     if (status) {
       const statusRes = await this.statusRepository.findOneBy({
         id: status,
@@ -104,6 +114,21 @@ export class PulperiaV2Service {
       }
 
       pulperia.status = statusRes;
+    }
+
+    // update avatar
+    if (file) {
+      const imageDb = await this.imageService.findById(pulperia.avatar.id);
+      if (!imageDb) {
+        throw new Error('Image not found');
+      }
+
+      if (imageDb.id !== IMAGECONST.PULPERIA) {
+        await this.imageService.deleteById(imageDb.id);
+      }
+
+      const newImage = await this.imageService.uploadFile(file);
+      pulperia.avatar.id = newImage.id;
     }
 
     pulperia.updatedAt = new Date();
