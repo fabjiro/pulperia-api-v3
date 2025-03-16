@@ -10,6 +10,7 @@ import {
 import { Point } from 'geojson';
 import { IsNotEmpty } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
+import { Image } from '../../image/entity/image.entity';
 import { Status } from '../../status/entities/status.entity';
 import { PulperiaCategory } from '../../pulperia-category/entites/pulperia.categorie.entity';
 import { PulperiaProduct } from '../../pulperia-product/entites/pulperia.product.entity';
@@ -38,6 +39,9 @@ export class Pulperia {
 
   @ManyToOne(() => Status, (status) => status.pulperias)
   status: Status;
+
+  @ManyToOne(() => Image, (image) => image.pulperias)
+  avatar?: Image;
 
   @OneToMany(
     () => PulperiaCategory,

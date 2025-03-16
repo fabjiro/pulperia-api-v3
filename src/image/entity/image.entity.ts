@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Category } from '../../category/entities/category.entity';
+import { Pulperia } from '../../pulperia/entities/pulperia.entity';
 
 @Entity()
 export class Image {
@@ -25,4 +26,7 @@ export class Image {
 
   @OneToMany(() => Product, (product) => product.image)
   products: Product[];
+
+  @OneToMany(() => Pulperia, (pulperia) => pulperia.avatar)
+  pulperias: Pulperia[];
 }
