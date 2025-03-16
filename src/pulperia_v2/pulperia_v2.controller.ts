@@ -6,13 +6,16 @@ import {
   Param,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PulperiaV2Service } from './pulperia_v2.service';
 import { JwtAuthGuard } from '../guard/auth.guard';
 import { plainToInstance } from 'class-transformer';
 import { UserResDto } from './dto/pulperia.res.dto';
 import { PulperiaReqDto } from './dto/pulperia.req.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('pulperia_v2')
 export class PulperiaV2Controller {
@@ -75,6 +78,27 @@ export class PulperiaV2Controller {
         data.id,
         data.name,
         data.status,
+      );
+    } catch (error) {
+      throw new NotFoundException(error.toString());
+    }
+  }
+
+  @Put('avatar/:id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file')) // 'file' debe coincidir con el nombre del campo en el formulario
+  async updateAvatar(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    try {
+      // talves validar si es admin puede actualizar
+      //  si es el owner o el creator tambien
+      return await this.pulperiaV2Service.updatePulperia(
+        id,
+        undefined,
+        undefined,
+        file,
       );
     } catch (error) {
       throw new NotFoundException(error.toString());
