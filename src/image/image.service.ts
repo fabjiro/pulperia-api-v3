@@ -142,7 +142,9 @@ export class ImageService {
     await this.axiosInstance.delete(`/file/${link.match(uuidRegex)[0]}`);
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<ImagePostRes> {
+  async uploadFile(file: Express.Multer.File): Promise<Image | null> {
+    console.log(file);
+    console.log(file.mimetype);
     // Convertir el archivo a un Blob
     const blob = new Blob([file.buffer], { type: file.mimetype });
 
@@ -150,12 +152,19 @@ export class ImageService {
     const formData = new FormData();
     formData.append('file', blob);
 
-    const { data } = await this.axiosInstance.post('/file/form', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const { data } = await this.axiosInstance.post<ImagePostRes>(
+      '/file/form',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
+    );
 
-    return data as ImagePostRes;
+    return await this.imageRepository.save({
+      original_link: data.link,
+      min_link: data.link,
+    });
   }
 }

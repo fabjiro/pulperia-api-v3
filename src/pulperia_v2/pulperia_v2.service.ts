@@ -92,6 +92,7 @@ export class PulperiaV2Service {
       where: {
         id,
       },
+      relations: ['avatar'],
     });
 
     if (!pulperia) {
@@ -123,12 +124,14 @@ export class PulperiaV2Service {
         throw new Error('Image not found');
       }
 
+      const newImage = await this.imageService.uploadFile(file);
+      pulperia.avatar.id = newImage.id;
+
+      await this.pulperiaRepository.save(pulperia);
+
       if (imageDb.id !== IMAGECONST.PULPERIA) {
         await this.imageService.deleteById(imageDb.id);
       }
-
-      const newImage = await this.imageService.uploadFile(file);
-      pulperia.avatar.id = newImage.id;
     }
 
     pulperia.updatedAt = new Date();
