@@ -47,4 +47,16 @@ export class UserService {
       relations: ['rol', 'avatar'],
     });
   }
+
+  async getAll(rol?: number) {
+    return await this.userRepository.find({
+      select: ['id', 'name', 'email', 'rol', 'avatar'],
+      where: {
+        rol: {
+          id: rol,
+        },
+      },
+      relations: ['rol', 'avatar'],
+    });
+  }
 }
