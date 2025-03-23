@@ -15,3 +15,17 @@ export class RegisterUserDto {
   // @IsBase64({}, { message: 'La imagen debe ser un base64' })
   avatar?: string;
 }
+
+export class UpdateUserDto {
+  @IsOptional()
+  name: string;
+
+  @IsOptional()
+  password: string;
+
+  @IsOptional()
+  status: number;
+
+  @IsOptional()
+  rol: number;
+}
