@@ -67,6 +67,7 @@ export class UserService {
 
   async update(id: number, userData: Partial<IUser>) {
     const user = await this.userRepository.findOne({
+      select: ['id', 'name', 'email', 'rol', 'avatar'],
       where: { id },
       relations: ['rol', 'avatar'],
     });
@@ -117,6 +118,8 @@ export class UserService {
       }
     }
 
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+
+    return user;
   }
 }
