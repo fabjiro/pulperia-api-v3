@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { StatusService } from '../status/status.service';
 import { ImageService } from '../image/image.service';
 import {
@@ -11,17 +11,20 @@ import {
   IUpdateProduct,
 } from './interface/product.interface';
 import { STATUSENUM } from '../status/enum/status.enum';
-import { CategoryService } from '../category/category.service';
 import { IMAGEENUM } from '../image/enum/image.enum';
+import { Category } from '../category/entities/category.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+
     private readonly statusService: StatusService,
     private readonly imageService: ImageService,
-    private readonly categoryService: CategoryService,
   ) {}
 
   async update(updateProductDto: IUpdateProduct, id: number) {
@@ -44,9 +47,9 @@ export class ProductService {
     }
 
     if (updateProductDto.category) {
-      const category = await this.categoryService.findOne(
-        updateProductDto.category,
-      );
+      const category = await this.categoryRepository.findOneBy({
+        id: updateProductDto.category,
+      });
 
       if (!category) {
         throw new Error('Category not found');
@@ -99,9 +102,9 @@ export class ProductService {
   }
 
   async create(createProductDto: ICreateProduct) {
-    const category = await this.categoryService.findOne(
-      createProductDto.category,
-    );
+    const category = await this.categoryRepository.findOneBy({
+      id: createProductDto.category,
+    });
 
     if (!category) {
       throw new Error('Category not found');
@@ -144,7 +147,9 @@ export class ProductService {
     }
 
     if (categoryId) {
-      const category = await this.categoryService.findOne(categoryId);
+      const category = await this.categoryRepository.findOneBy({
+        id: categoryId,
+      });
 
       if (!category) {
         throw new Error('Category not found');
@@ -171,25 +176,58 @@ export class ProductService {
   async getProductsByName(query: IGetProductByName) {
     const { name, status } = query;
 
-    if (status) {
-      const statusDb = await this.statusService.checkStatusId(status);
+    console.log('Xd');
 
-      if (!statusDb) {
-        throw new Error('Status not found');
-      }
-    }
-
-    return await this.productRepository.find({
-      where: {
-        name: ILike(`%${name}%`),
-        ...(status !== null && {
+    const [categorys, products] = await Promise.all([
+      this.categoryRepository.find({
+        where: {
           status: {
             id: status,
           },
-        }),
-      },
-      relations: ['status', 'image'],
+          products: {
+            status: {
+              id: status,
+            },
+          },
+        },
+        relations: ['products', 'products.image', 'products.status'],
+      }),
+      this.productRepository.find({
+        where: {
+          status: {
+            id: status,
+          },
+        },
+        relations: ['status', 'image'],
+      }),
+    ]);
+
+    // coincidencias en nombre de las categorias
+    const categorysByName = categorys.filter((category) =>
+      category.name.toLowerCase().includes(name.toLowerCase()),
+    );
+
+    // coindicencias en nombre de los productos
+    const productsByName = products.filter((product) =>
+      product.name.toLowerCase().includes(name.toLowerCase()),
+    );
+
+    let resultado = [
+      ...categorysByName.map((category) => category.products)[0],
+      ...productsByName,
+    ];
+
+    // necesito hacer un set para eliminar los duplicados
+    const set = new Set();
+    resultado = resultado.filter((item) => {
+      if (!set.has(item.id)) {
+        set.add(item.id);
+        return true;
+      }
+      return false;
     });
+
+    return resultado;
   }
 
   async findAll() {
