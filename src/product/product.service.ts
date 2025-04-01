@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { StatusService } from '../status/status.service';
 import { ImageService } from '../image/image.service';
 import {
@@ -176,56 +176,43 @@ export class ProductService {
   async getProductsByName(query: IGetProductByName) {
     const { name, status } = query;
 
-    console.log('Xd');
-
     const [categorys, products] = await Promise.all([
       this.categoryRepository.find({
         where: {
-          status: {
-            id: status,
-          },
-          products: {
-            status: {
-              id: status,
-            },
-          },
+          statusId: status,
+          name: ILike(`%${name}%`),
         },
-        relations: ['products', 'products.image', 'products.status'],
+        relations: ['products', 'products.image'],
       }),
       this.productRepository.find({
         where: {
-          status: {
-            id: status,
-          },
+          statusId: status,
+          name: ILike(`%${name}%`),
         },
-        relations: ['status', 'image'],
+        relations: ['image'],
       }),
     ]);
 
-    // coincidencias en nombre de las categorias
-    const categorysByName = categorys.filter((category) =>
-      category.name.toLowerCase().includes(name.toLowerCase()),
-    );
+    const uniqueIds = new Set();
+    const resultado = [];
 
-    // coindicencias en nombre de los productos
-    const productsByName = products.filter((product) =>
-      product.name.toLowerCase().includes(name.toLowerCase()),
-    );
-
-    let resultado = [
-      ...categorysByName.map((category) => category.products)[0],
-      ...productsByName,
-    ];
-
-    // necesito hacer un set para eliminar los duplicados
-    const set = new Set();
-    resultado = resultado.filter((item) => {
-      if (!set.has(item.id)) {
-        set.add(item.id);
-        return true;
+    // Agregar productos de categorías
+    for (const category of categorys) {
+      for (const product of category.products) {
+        if (product.statusId === status && !uniqueIds.has(product.id)) {
+          uniqueIds.add(product.id);
+          resultado.push(product);
+        }
       }
-      return false;
-    });
+    }
+
+    // Agregar productos
+    for (const product of products) {
+      if (!uniqueIds.has(product.id)) {
+        uniqueIds.add(product.id);
+        resultado.push(product);
+      }
+    }
 
     return resultado;
   }

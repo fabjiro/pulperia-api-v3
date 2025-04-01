@@ -20,6 +20,12 @@ export class Category {
   @IsNotEmpty()
   name: string;
 
+  @Column({ name: 'statusId', nullable: true })
+  statusId: number;
+
+  @Column({ name: 'imageId', nullable: true })
+  imageId: number;
+
   @OneToMany(
     () => PulperiaCategory,
     (pulperiaCategory) => pulperiaCategory.categorie,
