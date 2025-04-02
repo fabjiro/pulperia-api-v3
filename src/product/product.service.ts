@@ -176,7 +176,7 @@ export class ProductService {
   async getProductsByName(query: IGetProductByName) {
     const { name, status } = query;
 
-    const [categorys, products] = await Promise.all([
+    const [categorys = [], products = []] = await Promise.all([
       this.categoryRepository.find({
         where: {
           statusId: status,
