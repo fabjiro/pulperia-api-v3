@@ -20,10 +20,10 @@ export class Category {
   @IsNotEmpty()
   name: string;
 
-  @Column({ name: 'statusId', nullable: true })
+  @Column({ name: 'statusId' })
   statusId: number;
 
-  @Column({ name: 'imageId', nullable: true })
+  @Column({ name: 'imageId' })
   imageId: number;
 
   @OneToMany(

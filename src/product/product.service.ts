@@ -28,7 +28,7 @@ export class ProductService {
   ) {}
 
   async update(updateProductDto: IUpdateProduct, id: number) {
-    const product = await this.findOne(id, true);
+    const product = await this.findOne(id);
 
     if (!product) {
       throw new Error('Product not found');
@@ -39,23 +39,11 @@ export class ProductService {
     }
 
     if (updateProductDto.status) {
-      const status = await this.statusService.findOne(updateProductDto.status);
-      if (!status) {
-        throw new Error('Status not found');
-      }
-      product.status = status;
+      product.statusId = updateProductDto.status;
     }
 
     if (updateProductDto.category) {
-      const category = await this.categoryRepository.findOneBy({
-        id: updateProductDto.category,
-      });
-
-      if (!category) {
-        throw new Error('Category not found');
-      }
-
-      product.category = category;
+      product.categoryId = updateProductDto.category;
     }
 
     if (updateProductDto.image) {
@@ -73,19 +61,10 @@ export class ProductService {
     }
 
     await this.productRepository.update(id, {
-      name: product.name,
-      status: {
-        id: product.status?.id,
-      },
-      category: {
-        id: product.category?.id,
-      },
-      image: {
-        id: product.image?.id,
-      },
+      ...product,
     });
 
-    return await this.findOne(id);
+    return id;
   }
 
   async deleteById(id: number) {

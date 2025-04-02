@@ -20,11 +20,14 @@ export class Product {
   @IsNotEmpty()
   name: string;
 
-  @Column({ name: 'statusId', nullable: true })
+  @Column({ name: 'statusId' })
   statusId: number;
 
-  @Column({ name: 'imageId', nullable: true })
+  @Column({ name: 'imageId' })
   imageId: number;
+
+  @Column({ name: 'categoryId' })
+  categoryId: number;
 
   @OneToMany(
     () => PulperiaProduct,

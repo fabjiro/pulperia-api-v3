@@ -26,20 +26,14 @@ export class CategoryService {
   ) {}
 
   async update(category: IUpdateCategory, id: number) {
-    const categoryLocal = await this.findOne(id, true);
+    const categoryLocal = await this.findOne(id);
 
     if (!category) {
       throw new Error('Category not found');
     }
 
     if (category.status) {
-      const status = await this.statusService.findOne(category.status);
-
-      if (!status) {
-        throw new Error('Status not found');
-      }
-
-      categoryLocal.status = status;
+      categoryLocal.statusId = category.status;
     }
 
     if (category.name) {
@@ -50,27 +44,17 @@ export class CategoryService {
       const newImage = await this.imageService.create(category.image);
 
       await this.categoryRepository.update(id, {
-        image: {
-          id: newImage.id,
-        },
+        imageId: newImage.id,
       });
 
-      await this.imageService.deleteById(categoryLocal.image.id);
+      await this.imageService.deleteById(categoryLocal.imageId);
 
-      categoryLocal.image = newImage;
+      categoryLocal.imageId = newImage.id;
     }
 
-    await this.categoryRepository.update(id, {
-      name: categoryLocal.name,
-      status: {
-        id: categoryLocal.status?.id,
-      },
-      image: {
-        id: categoryLocal.image?.id,
-      },
-    });
+    await this.categoryRepository.update(id, categoryLocal);
 
-    return await this.findOne(id);
+    return id;
   }
 
   async create(category: ICreateCategory) {
