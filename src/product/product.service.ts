@@ -117,36 +117,10 @@ export class ProductService {
   async findByFilter(query: IProductGet) {
     const { status, categoryId } = query;
 
-    if (status) {
-      const statusDb = await this.statusService.findOne(status);
-
-      if (!statusDb) {
-        throw new Error('Status not found');
-      }
-    }
-
-    if (categoryId) {
-      const category = await this.categoryRepository.findOneBy({
-        id: categoryId,
-      });
-
-      if (!category) {
-        throw new Error('Category not found');
-      }
-    }
-
     return await this.productRepository.find({
       where: {
-        ...(status !== null && {
-          status: {
-            id: status,
-          },
-        }),
-        ...(categoryId !== null && {
-          category: {
-            id: categoryId,
-          },
-        }),
+        statusId: status,
+        categoryId: categoryId,
       },
       relations: ['status', 'image'],
     });

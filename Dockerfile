@@ -1,5 +1,5 @@
 # Etapa de construcción
-FROM node:alpine AS builder
+FROM oven/bun:canary-alpine AS builder
 
 # Configuración del entorno de trabajo
 WORKDIR /app
@@ -8,16 +8,16 @@ WORKDIR /app
 COPY package.json ./
 
 # Instala todas las dependencias del proyecto (incluyendo devDependencies)
-RUN npm install
+RUN bun install
 
 # Copia el resto del código fuente
 COPY . .
 
 # Compila el proyecto usando el comando definido en package.json
-RUN npm run build
+RUN bun run build
 
 # Etapa final: imagen de producción
-FROM node:alpine AS runner
+FROM oven/bun:canary-alpine AS runner
 
 # Configuración del entorno de trabajo
 WORKDIR /app
@@ -30,5 +30,5 @@ COPY --from=builder /app/node_modules ./node_modules
 # Expone el puerto de la aplicación
 EXPOSE 3000
 
-# Ejecuta la aplicación con Node.js
-CMD ["node", "dist/main.js"]
+# Ejecuta la aplicación con Bun
+CMD ["bun", "dist/main.js"]
