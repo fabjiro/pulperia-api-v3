@@ -106,6 +106,21 @@ export class CategoryService {
     });
   }
 
+  async getCountProductsByCategories(categoryIds: number[], status: number) {
+    const counts = await this.productRepository
+      .createQueryBuilder('product')
+      .select('product.categoryId, COUNT(product.id) as count')
+      .where('product.categoryId IN (:...categoryIds)', { categoryIds })
+      .andWhere('product.status.id = :status', { status })
+      .groupBy('product.categoryId')
+      .getRawMany();
+
+    return counts.reduce((acc, { categoryId, count }) => {
+      acc[categoryId] = count;
+      return acc;
+    }, {});
+  }
+
   async findOne(id: number, relation: boolean = false) {
     return await this.categoryRepository.findOne({
       where: { id },

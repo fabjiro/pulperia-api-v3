@@ -66,20 +66,16 @@ export class CategoryController {
   async findAll(@Query('status') status?: number) {
     try {
       const allCategorys = await this.categoryService.findAll(status);
-
-      return await Promise.all(
-        allCategorys.map(async (category) => {
-          const countProduct =
-            await this.categoryService.getCountProductByCategory({
-              categoryId: category.id,
-              status: status ?? STATUSENUM.ACTIVE,
-            });
-          return {
-            ...category,
-            countProduct,
-          };
-        }),
+      const categoryIds = allCategorys.map((category) => category.id);
+      const counts = await this.categoryService.getCountProductsByCategories(
+        categoryIds,
+        status ?? STATUSENUM.ACTIVE,
       );
+
+      return allCategorys.map((category) => ({
+        ...category,
+        countProduct: counts[category.id] || 0,
+      }));
     } catch (error) {
       throw new NotFoundException(error.toString());
     }
