@@ -99,29 +99,59 @@ export class PulperiaController {
     @Query('status') status?: number,
   ) {
     try {
+      // se comenzara a procesar data desde el codigo
       const reponse = await this.pulperiaService.findLocationsWithinRadius(
         {
           lat,
           lng,
         },
         radius,
-        status,
       );
 
-      const resultStatus = await this.statusService.findOne(
-        status ?? STATUSENUM.REVIEW,
-      );
+      // return reponse;
 
-      return reponse.map((pulperia) => ({
-        id: pulperia.id,
-        name: pulperia.name,
-        status: resultStatus,
-        distance: pulperia.distance,
-        createdById: pulperia.creatorId,
-        coordinates: {
+      for (const pulperia of reponse) {
+        pulperia.coordinates = {
           lat: pulperia.latitude,
           lng: pulperia.longitude,
-        },
+        };
+      }
+
+      // return reponse;
+
+      if (status) {
+        return reponse
+          .filter(
+            (pulperia: any) => Number(pulperia.statusId) === Number(status),
+          ) // Filtrar por status
+          .map((pulperia: any) => {
+            // Transformar el arreglo filtrado
+            return {
+              id: pulperia.id,
+              name: pulperia.name,
+              coordinates: pulperia.coordinates,
+              createdById: pulperia.creatorId,
+              distance: this.pulperiaService.haversine(
+                lat,
+                lng,
+                pulperia.coordinates.lat,
+                pulperia.coordinates.lng,
+              ),
+            };
+          });
+      }
+
+      return reponse.map((pulperia: any) => ({
+        id: pulperia.id,
+        name: pulperia.name,
+        coordinates: pulperia.coordinates,
+        createdById: pulperia.creatorId,
+        distance: this.pulperiaService.haversine(
+          lat,
+          lng,
+          pulperia.coordinates.lat,
+          pulperia.coordinates.lng,
+        ),
       }));
     } catch (error) {
       throw new NotFoundException(error.toString());

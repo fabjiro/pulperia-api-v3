@@ -230,45 +230,22 @@ export class PulperiaService {
   async findLocationsWithinRadius(
     corrdinate: ICoordinates,
     radius: number = 5,
-    status?: number,
   ) {
     const { lat, lng } = corrdinate;
 
-    if (status) {
-      const statusByid = await this.statusService.findOne(status);
-
-      if (!statusByid) {
-        throw new Error('Status not found');
-      }
-
-      return await this.pulperiaRepository.query(
-        `SELECT *,
-        ST_X(coordinates::geometry) AS latitude,
-       ST_Y(coordinates::geometry) AS longitude,
-       ST_Distance(
-         coordinates::geography,
-         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
-       ) AS distance
-FROM pulperia
-WHERE ST_DWithin(
+    return await this.pulperiaRepository.query(
+      `SELECT 
+    *,
+    ST_X(coordinates::geometry) AS latitude,
+    ST_Y(coordinates::geometry) AS longitude
+FROM 
+    pulperia
+WHERE 
+    ST_DWithin(
         coordinates::geography,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
         $3
-      )
-  AND "statusId" = $4
-ORDER BY distance;
-`,
-        [lat, lng, radius, status],
-      );
-    }
-
-    return await this.pulperiaRepository.query(
-      `SELECT * FROM pulperia
-         WHERE ST_DWithin(
-           coordinates::geography,
-           ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
-           $3
-         )`,
+    );`,
       [lat, lng, radius], // Recuerda: [longitud, latitud]
     );
   }
@@ -394,5 +371,48 @@ ORDER BY distance;
         },
       },
     });
+  }
+
+  // esta funcion es para caclular la distancia entre dos puntos
+  haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
+    // Radio de la Tierra en metros
+    const R = 6371000; // 6371.0 km * 1000 para convertir a metros
+
+    // Convertir grados a radianes
+    const lat1Rad = lat1 * (Math.PI / 180);
+    const lon1Rad = lon1 * (Math.PI / 180);
+    const lat2Rad = lat2 * (Math.PI / 180);
+    const lon2Rad = lon2 * (Math.PI / 180);
+
+    // Diferencias
+    const dlat = lat2Rad - lat1Rad;
+    const dlon = lon2Rad - lon1Rad;
+
+    // Fórmula del haversine
+    const a =
+      Math.sin(dlat / 2) ** 2 +
+      Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(dlon / 2) ** 2;
+    const c = 2 * Math.asin(Math.sqrt(a));
+
+    // Distancia en metros
+    const distance = R * c;
+    return distance;
+  }
+  decodeWKB(wkb) {
+    const buffer = Buffer.from(wkb, 'hex');
+    const geometryType = buffer.readUInt8(0);
+
+    if (geometryType !== 1) {
+      // 1 es para Point
+      throw new Error('Solo se soportan puntos en este ejemplo.');
+    }
+
+    const isLittleEndian = buffer.readUInt8(1) === 0;
+    const x = isLittleEndian ? buffer.readDoubleLE(2) : buffer.readDoubleBE(2);
+    const y = isLittleEndian
+      ? buffer.readDoubleLE(10)
+      : buffer.readDoubleBE(10);
+
+    return { latitude: y.toFixed(5), longitude: x.toFixed(5) };
   }
 }
