@@ -31,6 +31,12 @@ export class Pulperia {
   @Column({ name: 'avatarId' })
   avatarId: number;
 
+  @Column({ name: 'ownerId' })
+  ownerId: number;
+
+  @Column({ name: 'creatorId' })
+  creatorId: number;
+
   @ManyToOne(() => User, (user) => user.pulperiasAsOwner)
   @IsNotEmpty()
   owner: User;

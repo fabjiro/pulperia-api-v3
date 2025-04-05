@@ -110,25 +110,6 @@ export class PulperiaService {
       throw new Error('Pulperia already exists');
     }
 
-    const owner = await this.userService.findBydId(createPulperiaDto.ownerId);
-    if (!owner) {
-      throw new Error('Owner not found');
-    }
-
-    const creator = await this.userService.findBydId(
-      createPulperiaDto.creatorId,
-    );
-    if (!creator) {
-      throw new Error('Creator not found');
-    }
-
-    const status = await this.statusService.findOne(
-      createPulperiaDto.statusId ?? STATUSENUM.PENDING,
-    );
-    if (!status) {
-      throw new Error('Status not found');
-    }
-
     const createdPulperia = this.pulperiaRepository.create({
       ...createPulperiaDto,
       coordinates: {
@@ -138,9 +119,9 @@ export class PulperiaService {
           createPulperiaDto.coordinates.lng,
         ],
       },
-      status,
-      owner,
-      creator,
+      statusId: createPulperiaDto.statusId ?? STATUSENUM.REVIEW,
+      ownerId: createPulperiaDto.ownerId,
+      creatorId: createPulperiaDto.creatorId,
     });
 
     const newPulperia = await this.pulperiaRepository.save(createdPulperia);
