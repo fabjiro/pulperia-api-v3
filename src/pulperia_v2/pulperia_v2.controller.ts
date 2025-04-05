@@ -27,8 +27,14 @@ export class PulperiaV2Controller {
     try {
       const data = await this.pulperiaV2Service.getPulperiaById(id);
 
+      const coordinates = data.coordinates.coordinates;
+
       return {
         ...data,
+        coordinates: {
+          lat: coordinates[0],
+          lng: coordinates[1],
+        },
         owner: plainToInstance(UserResDto, data.owner),
         creator: plainToInstance(UserResDto, data.creator),
       };
