@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Pulperia } from './entities/pulperia.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   IPulperiaCreate,
   IPulperiaUpdate,
@@ -414,5 +414,17 @@ WHERE
       : buffer.readDoubleBE(10);
 
     return { latitude: y.toFixed(5), longitude: x.toFixed(5) };
+  }
+
+  getPulperiaByProductId(id: number | number[]) {
+    if (Array.isArray(id)) {
+      return this.pulperiaRepository.find({
+        where: { id: In(id) },
+      });
+    }
+
+    return this.pulperiaRepository.findOne({
+      where: { id },
+    });
   }
 }

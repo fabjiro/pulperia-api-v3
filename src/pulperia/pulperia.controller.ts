@@ -97,10 +97,11 @@ export class PulperiaController {
     @Query('lng') lng: number,
     @Query('radius') radius?: number,
     @Query('status') status?: number,
+    @Query('product') product?: number[],
   ) {
     try {
       // se comenzara a procesar data desde el codigo
-      const reponse = await this.pulperiaService.findLocationsWithinRadius(
+      let response = await this.pulperiaService.findLocationsWithinRadius(
         {
           lat,
           lng,
@@ -108,40 +109,35 @@ export class PulperiaController {
         radius,
       );
 
-      // return reponse;
-
-      for (const pulperia of reponse) {
+      for (const pulperia of response) {
         pulperia.coordinates = {
           lat: pulperia.latitude,
           lng: pulperia.longitude,
         };
       }
 
-      // return reponse;
-
+      // si tiene status lo filtramos por ese status
       if (status) {
-        return reponse
-          .filter(
-            (pulperia: any) => Number(pulperia.statusId) === Number(status),
-          ) // Filtrar por status
-          .map((pulperia: any) => {
-            // Transformar el arreglo filtrado
-            return {
-              id: pulperia.id,
-              name: pulperia.name,
-              coordinates: pulperia.coordinates,
-              createdById: pulperia.creatorId,
-              distance: this.pulperiaService.haversine(
-                lat,
-                lng,
-                pulperia.coordinates.lat,
-                pulperia.coordinates.lng,
-              ),
-            };
-          });
+        response = response.filter(
+          (pulperia: any) => Number(pulperia.statusId) === Number(status),
+        );
       }
 
-      return reponse.map((pulperia: any) => ({
+      if (product) {
+        // primero vamos a buscar los productos
+        const pulperiaByProducts =
+          await this.pulperiaService.getPulperiaByProductId(product);
+
+        if (Array.isArray(pulperiaByProducts)) {
+          const pulperiaIds = pulperiaByProducts.map((pulperia) => pulperia.id);
+
+          response = response.filter((pulperia: any) =>
+            pulperiaIds.includes(pulperia.id),
+          );
+        }
+      }
+
+      return response.map((pulperia: any) => ({
         id: pulperia.id,
         name: pulperia.name,
         coordinates: pulperia.coordinates,
