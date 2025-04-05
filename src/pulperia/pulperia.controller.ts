@@ -131,8 +131,11 @@ export class PulperiaController {
         if (Array.isArray(pulperiaByProducts)) {
           const pulperiaIds = pulperiaByProducts.map((pulperia) => pulperia.id);
 
-          response = response.filter((pulperia: any) =>
-            pulperiaIds.includes(pulperia.id),
+          response = response.filter(
+            (pulperia: any) =>
+              pulperiaIds.includes(pulperia.id) ||
+              pulperia.creatorId === UserEnum.CREATOR ||
+              pulperia.creatorId === UserEnum.COMMUNITY,
           );
         }
       }
